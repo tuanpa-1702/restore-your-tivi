@@ -1,0 +1,24 @@
+# Tivi Home
+
+> Android TV home screen (launcher) and its design system: glassmorphism UI on mesh gradient backgrounds, big light
+> clock, month calendar with Vietnamese lunar dates, Open-Meteo weather, editable dock, child lock with PIN.
+> Remote-controlled, Vietnamese UI, fixed 960x540 dp stage.
+
+## Start here
+- [AGENTS.md](AGENTS.md): how an AI should use this repository (design vs. build/install)
+- [README.md](README.md): features, install guide, prompts
+
+## Design system
+- [design/DESIGN.md](design/DESIGN.md): full design specification
+- [design/tokens/tokens.json](design/tokens/tokens.json): exact values
+- [design/tokens/tokens.css](design/tokens/tokens.css): tokens as CSS variables
+- [design/reference/home.html](design/reference/home.html): home screen reference
+- [design/reference/apps.html](design/reference/apps.html): apps grid reference
+- [design/reference/settings.html](design/reference/settings.html): settings reference
+- [design/reference/child-lock.html](design/reference/child-lock.html): child lock (?page=pick|active|pin|overlay)
+- [design/screenshots/](design/screenshots/): 1280x720 renders
+- [design/PROMPT.md](design/PROMPT.md): ready-made prompts
+
+## Android app
+- [app/AndroidManifest.xml](app/AndroidManifest.xml)
+- [app/java/com/tivibox/home/](app/java/com/tivibox/home/): Java sources (Android framework only)

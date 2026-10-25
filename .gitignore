@@ -1,0 +1,11 @@
+# Build output
+build/
+*.apk
+
+# Signing key: keep it on your own machine (same key = later builds install over earlier ones)
+*.keystore
+*.jks
+
+# Per-TV session files: backups contain serial numbers and device names, screenshots show Wi-Fi names
+backup/
+shots/
