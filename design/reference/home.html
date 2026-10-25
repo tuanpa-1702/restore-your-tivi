@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tivi Home · Màn hình chính</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="icons.js"></script>
+  <script src="lunar.js"></script>
+  <script src="stage.js"></script>
+</head>
+<body>
+<!-- Home screen. Fixed demo moment: Sunday 25/10/2026 19:25 (lunar 16/9 Bính Ngọ). Focus is on the first dock tile. -->
+<main class="stage theme-tim-hong">
+  <header class="topbar">
+    <div class="greeting"><span class="dot"></span>Xin chào Thỏ Miu!</div>
+    <div class="actions">
+      <span class="round" data-icon="lock" title="Khoá trẻ em"></span>
+      <span class="round" data-icon="wifi" title="Wi-Fi"></span>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="clock">19:25</div>
+    <div class="date">
+      <div class="weekday">Chủ Nhật</div>
+      <div class="solar">25 tháng 10, 2026</div>
+      <div class="lunar" id="lunar-line"></div>
+    </div>
+  </section>
+
+  <section class="cards">
+    <div class="glass" id="calendar">
+      <div class="cal-title">Tháng 10</div>
+      <div class="cal-grid" id="cal-grid"></div>
+    </div>
+    <div class="glass">
+      <div class="wx-head"><span class="badge" data-icon="moonCloud"></span><span class="title">Thời tiết</span></div>
+      <div class="wx-sub">Hà Nội · cập nhật 19:23</div>
+      <div class="wx-main">
+        <div class="wx-cond">Ít mây</div>
+        <div class="wx-detail" style="top:38px">Cảm giác 32° · Độ ẩm 71%</div>
+        <div class="wx-detail" style="top:53px">Cao 33° · Thấp 26° · Mưa 82%</div>
+        <div class="wx-temp">29°</div>
+      </div>
+      <div class="wx-line"></div>
+      <div class="wx-days">
+        <div class="wx-day"><div class="n">Hôm nay</div><div class="r"><span class="ic" data-icon="rain"></span>33°<span class="lo">26°</span></div></div>
+        <div class="wx-day"><div class="n">T2</div><div class="r"><span class="ic" data-icon="rain"></span>32°<span class="lo">25°</span></div></div>
+        <div class="wx-day"><div class="n">T3</div><div class="r"><span class="ic" data-icon="sunCloud"></span>31°<span class="lo">24°</span></div></div>
+        <div class="wx-day"><div class="n">T4</div><div class="r"><span class="ic" data-icon="sun"></span>31°<span class="lo">24°</span></div></div>
+      </div>
+    </div>
+  </section>
+
+  <nav class="dock">
+    <div class="tile focusable is-focused"><span class="box yt" data-icon="youtube"></span><span class="label">YouTube</span></div>
+    <div class="tile focusable"><span class="box" data-icon="store"></span><span class="label">Cửa hàng</span></div>
+    <div class="tile focusable"><span class="box" data-icon="gear"></span><span class="label">Cài đặt</span></div>
+    <div class="tile focusable"><span class="box" data-icon="grid"></span><span class="label">Ứng dụng</span></div>
+  </nav>
+</main>
+
+<script>
+  // Month grid, Monday first; lunar day after each solar day, "1/9" on the first day of a lunar month.
+  const Y = 2026, M = 10, TODAY = 25;
+  const grid = document.getElementById('cal-grid');
+  ['T2', 'T3', 'T4', 'T5', 'T6', 'T7', 'CN'].forEach((h, i) => {
+    grid.insertAdjacentHTML('beforeend', `<div class="cal-head${i === 6 ? ' sun' : ''}">${h}</div>`);
+  });
+  const first = (new Date(Y, M - 1, 1).getDay() + 6) % 7;
+  const days = new Date(Y, M, 0).getDate();
+  for (let i = 0; i < first; i++) grid.insertAdjacentHTML('beforeend', '<div class="cal-cell"></div>');
+  for (let d = 1; d <= days; d++) {
+    const l = LunarVN.solarToLunar(d, M, Y);
+    const col = (first + d - 1) % 7;
+    const cls = ['cal-cell', col === 6 ? 'sun' : '', d === TODAY ? 'today' : ''].join(' ');
+    const lunar = l.day === 1 ? `<span class="l first">1/${l.month}</span>` : `<span class="l">${l.day}</span>`;
+    grid.insertAdjacentHTML('beforeend', `<div class="${cls}"><span class="d">${d}</span>${lunar}</div>`);
+  }
+  const t = LunarVN.solarToLunar(TODAY, M, Y);
+  document.getElementById('lunar-line').textContent = `Âm lịch ${t.day}/${t.month} · năm ${LunarVN.yearName(t.year)}`;
+</script>
+</body>
+</html>

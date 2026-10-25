@@ -1,0 +1,158 @@
+/* Tivi Home reference styles. Every page is a 960x540 "stage" (1px = 1dp) scaled to the window by stage.js. */
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap");
+@import url("../tokens/tokens.css");
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 100%; height: 100%; overflow: hidden; background: #000; }
+body { font-family: var(--font-family); color: var(--text-primary); -webkit-font-smoothing: antialiased; }
+
+.stage {
+  position: absolute; left: 0; top: 0;
+  width: var(--stage-w); height: var(--stage-h);
+  padding: var(--stage-pad-top) var(--stage-pad-x) 0;
+  transform-origin: 0 0; overflow: hidden;
+  display: flex; flex-direction: column;
+}
+.theme-tim-hong { background: var(--bg-tim-hong); }
+.theme-dai-duong { background: var(--bg-dai-duong); }
+.theme-hoang-hon { background: var(--bg-hoang-hon); }
+
+svg.i { width: 100%; height: 100%; display: block; }
+
+/* ---------- glass surfaces ---------- */
+.glass { background: var(--glass-card-fill); border: 1px solid var(--glass-card-border); border-radius: var(--radius-card); }
+.badge {
+  width: 26px; height: 26px; flex: none; padding: 2px;
+  background: var(--glass-badge-fill); border: 1px solid var(--glass-badge-border); border-radius: var(--radius-badge);
+}
+
+/* Focusable things share one focus treatment: cream fill, 3px green ring, slight scale-up. */
+.focusable { transition: transform var(--focus-ms) ease-out; }
+.is-focused {
+  background: var(--focus-fill) !important;
+  border: 3px solid var(--focus-ring) !important;
+  color: var(--text-on-focus) !important;
+}
+.is-moving { border: 3px solid var(--focus-moving-ring) !important; }
+
+/* ---------- top bar ---------- */
+.topbar { height: 32px; display: flex; align-items: center; justify-content: space-between; flex: none; }
+.greeting { display: flex; align-items: center; gap: 9px; font-size: 13.5px; font-weight: 500; color: rgba(255,255,255,.90); }
+.greeting .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent-greeting-dot); }
+.actions { display: flex; align-items: center; gap: 10px; }
+.lock-status { font-size: 13px; font-weight: 500; color: var(--accent-amber); }
+.round {
+  width: 32px; height: 32px; border-radius: 50%; padding: 6px;
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.28); color: #fff;
+}
+.round.is-focused { background: rgba(255,255,255,.95) !important; border: 1px solid transparent !important; color: #1E1E26 !important; transform: scale(1.12); }
+.round.is-active { background: var(--accent-amber); border-color: transparent; color: #1E1E26; }
+
+/* ---------- hero: clock + date ---------- */
+.hero { height: 142px; position: relative; flex: none; }
+.clock { position: absolute; left: -6px; top: 4px; font-size: 138px; font-weight: 300; line-height: 1; letter-spacing: -0.02em; }
+.date { position: absolute; right: 0; bottom: 20px; text-align: right; }
+.weekday { font-size: 34px; font-weight: 700; line-height: 1.05; }
+.solar { font-size: 17px; color: rgba(255,255,255,.85); margin-top: 8px; }
+.lunar { font-size: 12.5px; color: rgba(255,255,255,.65); margin-top: 3px; }
+
+/* ---------- cards row ---------- */
+.cards { height: 199px; display: flex; gap: var(--gap); flex: none; }
+.cards > .glass { flex: 1; padding: 16px; position: relative; }
+
+.cal-title { font-size: 15px; font-weight: 500; line-height: 1; padding-top: 4px; }
+.cal-grid { display: grid; grid-template-columns: repeat(7, 1fr); margin-top: 6px; }
+.cal-head { font-size: 8.5px; font-weight: 500; color: rgba(255,255,255,.60); padding-left: 6px; height: 14px; }
+.cal-head.sun { color: rgba(247,161,181,.8); }
+.cal-cell { height: 24px; display: flex; align-items: center; gap: 3px; padding-left: 6px; margin-right: 4px; border-radius: 6px; }
+.cal-cell .d { font-size: 12px; font-weight: 500; }
+.cal-cell .l { font-size: 7.5px; color: var(--text-tertiary); }
+.cal-cell.sun .d { color: var(--accent-sunday); }
+.cal-cell .l.first { color: var(--accent-lunar-first); }
+.cal-cell.today { background: var(--accent-today); margin-left: -5px; padding-left: 11px; }
+.cal-cell.today .d { color: var(--accent-on-today); }
+.cal-cell.today .l { color: rgba(15,59,28,.8); }
+
+.wx-head { display: flex; align-items: center; gap: 10px; }
+.wx-head .title { font-size: 15px; font-weight: 500; }
+.wx-sub { font-size: 9.5px; color: rgba(255,255,255,.65); margin-top: 6px; }
+.wx-main { position: relative; height: 78px; }
+.wx-cond { position: absolute; left: 0; top: 12px; font-size: 16px; font-weight: 500; }
+.wx-detail { position: absolute; left: 0; font-size: 10px; color: rgba(255,255,255,.70); }
+.wx-temp { position: absolute; right: -2px; top: 0; font-size: 54px; font-weight: 300; line-height: 1.2; }
+.wx-line { height: 1px; background: var(--glass-divider); margin-top: 0; }
+.wx-days { display: grid; grid-template-columns: repeat(4, 1fr); margin-top: 8px; }
+.wx-day .n { font-size: 9px; font-weight: 500; color: rgba(255,255,255,.65); }
+.wx-day .r { display: flex; align-items: center; gap: 4px; margin-top: 4px; font-size: 10.5px; }
+.wx-day .r .ic { width: 20px; height: 20px; }
+.wx-day .r .lo { color: rgba(255,255,255,.55); }
+
+/* ---------- dock ---------- */
+.dock { height: 79px; margin-top: 17px; display: flex; gap: var(--gap); flex: none; }
+.tile {
+  flex: 1; display: flex; align-items: center; gap: 12px; padding-left: 18px; min-width: 0;
+  background: var(--glass-tile-fill); border: 1px solid var(--glass-tile-border); border-radius: var(--radius-card);
+  font-size: 22px; font-weight: 700; white-space: nowrap;
+}
+.tile.is-focused { border-radius: var(--radius-focus-outer); padding-left: 16px; transform: scale(1.035); }
+.tile .box {
+  width: 38px; height: 38px; flex: none; padding: 7px; border-radius: var(--radius-icon-box);
+  background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.25);
+}
+.tile.is-focused .box { background: rgba(0,0,0,.08); border-color: rgba(0,0,0,.14); }
+.tile .box.yt { background: #0B0B0B; border: none; color: #fff; }
+.tile .label { overflow: hidden; text-overflow: ellipsis; }
+
+/* ---------- full-screen pages (Apps, Settings, Child lock) ---------- */
+.page-head { display: flex; align-items: center; gap: 14px; flex: none; }
+.page-title { font-size: 26px; font-weight: 700; }
+.page-sub { font-size: 12.5px; color: rgba(255,255,255,.70); margin-top: 2px; }
+.hint { position: absolute; left: 0; right: 0; bottom: 28px; text-align: center; font-size: 12px; color: rgba(255,255,255,.60); }
+
+.apps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 18px; }
+.app {
+  height: 112px; padding: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--glass-card-fill); border: 1px solid var(--glass-card-border); border-radius: 14px;
+}
+.app.is-focused, .app.is-moving { background: rgba(255,255,255,.13) !important; color: #fff !important; }
+.app .art { width: 100%; height: 60px; border-radius: 8px; display: grid; place-items: center; }
+.app .art .glyph { width: 46px; height: 46px; border-radius: 11px; padding: 9px; color: #fff; }
+.app .name { margin-top: 8px; font-size: 12px; color: rgba(255,255,255,.95); }
+
+.rows { width: 640px; margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.row { padding: 12px 18px; background: var(--glass-card-fill); border: 1px solid var(--glass-card-border); border-radius: 14px; }
+.row .t { font-size: 16px; font-weight: 500; }
+.row .v { font-size: 13px; color: rgba(255,255,255,.70); margin-top: 3px; }
+.row.is-focused .v { color: var(--text-on-focus-secondary); }
+
+.choices { display: flex; justify-content: center; gap: 16px; }
+.choice {
+  width: 150px; height: 130px; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--glass-tile-fill); border: 1px solid var(--glass-tile-border); border-radius: var(--radius-card);
+}
+.choice.wide { width: 200px; }
+.choice.is-focused { border-radius: var(--radius-focus-outer); transform: scale(1.06); }
+.choice .big { font-size: 54px; font-weight: 300; line-height: 1; }
+.choice.wide .big { font-size: 22px; font-weight: 700; }
+.choice .cap { font-size: 13px; color: rgba(255,255,255,.70); margin-top: 14px; }
+.choice.is-focused .cap { color: var(--text-on-focus-secondary); }
+
+.pin-card { padding: 12px 28px 16px; display: flex; flex-direction: column; align-items: center; }
+.pin-boxes { display: flex; gap: 6px; margin-top: 8px; }
+.pin-boxes .grp { width: 10px; }
+.pin-box {
+  width: 30px; height: 40px; border-radius: 8px; display: grid; place-items: center; font-size: 24px; font-weight: 300;
+  background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.30);
+}
+.pin-box.next { border: 2px solid var(--focus-ring); }
+.keys { display: grid; grid-template-columns: repeat(3, 64px); gap: 10px; margin-top: 18px; }
+.key {
+  height: 42px; border-radius: var(--radius-key); display: grid; place-items: center; font-size: 24px; font-weight: 300;
+  background: var(--glass-tile-fill); border: 1px solid var(--glass-tile-border);
+}
+.key.word { font-size: 17px; font-weight: 500; }
+.key.ok { background: rgba(142,224,143,.30); }
+.key.is-focused { border-radius: var(--radius-key); }
+.pin-error { font-size: 14px; color: var(--accent-amber); margin-top: 8px; min-height: 18px; }
+
+.overlay-dim { position: absolute; inset: 0; background: rgba(0,0,0,.40); }

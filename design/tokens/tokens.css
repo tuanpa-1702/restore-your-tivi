@@ -1,0 +1,68 @@
+/* Tivi Home design tokens as CSS custom properties. 1px here = 1dp on the 960x540 stage. Source of truth: tokens.json */
+:root {
+  --stage-w: 960px;
+  --stage-h: 540px;
+  --stage-pad-x: 40px;
+  --stage-pad-top: 32px;
+
+  --font-family: "Roboto", "Segoe UI", system-ui, sans-serif;
+
+  --text-primary: #FFFFFF;
+  --text-secondary: rgba(255, 255, 255, 0.70);
+  --text-tertiary: rgba(255, 255, 255, 0.55);
+  --text-on-focus: #15151C;
+  --text-on-focus-secondary: rgba(21, 21, 28, 0.70);
+
+  --glass-card-fill: rgba(255, 255, 255, 0.11);
+  --glass-card-border: rgba(255, 255, 255, 0.20);
+  --glass-tile-fill: rgba(255, 255, 255, 0.13);
+  --glass-tile-border: rgba(255, 255, 255, 0.24);
+  --glass-badge-fill: rgba(255, 255, 255, 0.15);
+  --glass-badge-border: rgba(255, 255, 255, 0.24);
+  --glass-divider: rgba(255, 255, 255, 0.14);
+
+  --focus-ring: #8EE08F;
+  --focus-fill: #F3EEE8;
+  --focus-moving-ring: #FFC857;
+
+  --accent-greeting-dot: #6EE7A8;
+  --accent-today: #8EE08F;
+  --accent-on-today: #0F3B1C;
+  --accent-sunday: #F7A1B5;
+  --accent-lunar-first: #FFD27A;
+  --accent-amber: #FFC857;
+  --accent-brand: #5B3FE0;
+
+  --radius-card: 18px;
+  --radius-focus-outer: 20px;
+  --radius-focus-inner: 17px;
+  --radius-icon-box: 10px;
+  --radius-badge: 8px;
+  --radius-key: 12px;
+
+  --gap: 14px;
+  --focus-ms: 150ms;
+
+  /* Mesh backgrounds: blobs listed top-most first (CSS paints the first layer on top). */
+  --bg-tim-hong:
+    radial-gradient(circle at 55% 30%, #0A0A1C 0, rgba(10, 10, 28, .5) 130px, transparent 288px),
+    radial-gradient(circle at 80% 102%, #16A6B6 0, rgba(22, 166, 182, .5) 225px, transparent 499px),
+    radial-gradient(circle at 22% 108%, #F08A2E 0, rgba(240, 138, 46, .5) 138px, transparent 307px),
+    radial-gradient(circle at 98% 2%, #E2468F 0, rgba(226, 70, 143, .5) 216px, transparent 480px),
+    radial-gradient(circle at 12% 2%, #6A4BF5 0, rgba(106, 75, 245, .5) 268px, transparent 595px),
+    #0C0A22;
+  --bg-dai-duong:
+    radial-gradient(circle at 55% 32%, #041019 0, rgba(4, 16, 25, .5) 130px, transparent 288px),
+    radial-gradient(circle at 85% 100%, #22D3EE 0, rgba(34, 211, 238, .5) 194px, transparent 432px),
+    radial-gradient(circle at 30% 105%, #14B8A6 0, rgba(20, 184, 166, .5) 173px, transparent 384px),
+    radial-gradient(circle at 95% 5%, #0EA5E9 0, rgba(14, 165, 233, .5) 194px, transparent 432px),
+    radial-gradient(circle at 10% 0%, #1D4ED8 0, rgba(29, 78, 216, .5) 259px, transparent 576px),
+    #051421;
+  --bg-hoang-hon:
+    radial-gradient(circle at 55% 32%, #12060C 0, rgba(18, 6, 12, .5) 130px, transparent 288px),
+    radial-gradient(circle at 85% 102%, #F59E0B 0, rgba(245, 158, 11, .5) 194px, transparent 432px),
+    radial-gradient(circle at 25% 105%, #7C3AED 0, rgba(124, 58, 237, .5) 173px, transparent 384px),
+    radial-gradient(circle at 95% 5%, #E11D48 0, rgba(225, 29, 72, .5) 216px, transparent 480px),
+    radial-gradient(circle at 10% 2%, #F97316 0, rgba(249, 115, 22, .5) 238px, transparent 528px),
+    #1A0A14;
+}

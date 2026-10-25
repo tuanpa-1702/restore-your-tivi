@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Tivi Home · Khoá trẻ em</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="icons.js"></script>
+  <script src="stage.js"></script>
+</head>
+<body>
+<!--
+  Child lock, one page at a time. Pick the page with ?page=pick | active | pin | overlay (default pick).
+  pick: preset times + parent's custom minutes · active: countdown + actions · pin: number pad · overlay: time is up.
+-->
+<main class="stage theme-tim-hong" id="stage">
+  <div class="page-head" id="head">
+    <span class="round is-active" style="width:40px;height:40px;padding:9px" data-icon="lock"></span>
+    <div>
+      <div class="page-title">Khoá trẻ em</div>
+      <div class="page-sub" id="sub"></div>
+    </div>
+  </div>
+  <div id="page" style="position:relative;flex:1"></div>
+  <div class="hint" id="hint"></div>
+</main>
+
+<template id="t-pick">
+  <div class="choices" style="margin-top:70px">
+    <div class="choice is-focused"><div class="big">15</div><div class="cap">phút</div></div>
+    <div class="choice"><div class="big">30</div><div class="cap">phút</div></div>
+    <div class="choice"><div class="big">1</div><div class="cap">tiếng</div></div>
+    <div class="choice"><div class="big">2</div><div class="cap">tiếng</div></div>
+    <div class="choice"><div class="big">45</div><div class="cap">phút · tuỳ chỉnh</div></div>
+  </div>
+</template>
+
+<template id="t-active">
+  <div style="text-align:center;margin-top:20px">
+    <div style="font-size:96px;font-weight:300;line-height:1.15">14:54</div>
+    <div style="font-size:14px;color:var(--text-secondary)">còn lại trước khi khoá</div>
+  </div>
+  <div class="choices" style="margin-top:28px">
+    <div class="choice wide is-focused"><div class="big">Khoá ngay</div><div class="cap">không cần mã</div></div>
+    <div class="choice wide"><div class="big">Đổi thời gian</div><div class="cap">cần mã PIN</div></div>
+    <div class="choice wide"><div class="big">Tắt hẹn giờ</div><div class="cap">cần mã PIN</div></div>
+  </div>
+</template>
+
+<template id="t-pin">
+  <div style="display:flex;justify-content:center;margin-top:20px">
+    <div class="glass pin-card">
+      <div style="font-size:14px;color:var(--text-secondary)">Mã PIN gồm 8 số</div>
+      <div class="pin-boxes" data-pin-boxes></div>
+      <div class="keys" data-keys></div>
+      <div class="pin-error"></div>
+    </div>
+  </div>
+</template>
+
+<template id="t-overlay">
+  <div class="overlay-dim"></div>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center">
+    <div class="glass pin-card" style="padding:18px 48px">
+      <span style="width:44px;height:44px;color:var(--accent-amber)" data-icon="lock"></span>
+      <div style="font-size:26px;font-weight:700;margin-top:8px">Hết giờ xem TV rồi!</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.8);margin-top:4px">Nghỉ ngơi một chút nhé. Bố mẹ nhập mã PIN để mở khoá.</div>
+      <div class="pin-boxes" data-pin-boxes style="margin-top:14px"></div>
+      <div class="keys" data-keys></div>
+      <div class="pin-error"></div>
+    </div>
+  </div>
+</template>
+
+<script>
+  const PAGES = {
+    pick: ['Cho bé xem thêm bao lâu rồi khoá? Hết giờ, TV hiện màn hình khoá và dừng phim.', '◀ ▶ chọn · OK để bắt đầu · Back để quay lại'],
+    active: ['Đang hẹn giờ. Hết giờ, TV sẽ khoá cho đến khi bố mẹ nhập mã PIN.', ''],
+    pin: ['Nhập mã PIN để tắt hẹn giờ.', '◀ ▶ ▲ ▼ chọn phím, OK để bấm · hoặc bấm số trên remote · ⌫ xoá một số'],
+    overlay: ['', '']
+  };
+  const name = new URLSearchParams(location.search).get('page') || 'pick';
+  const page = document.getElementById('page');
+  page.appendChild(document.getElementById('t-' + name).content.cloneNode(true));
+  document.getElementById('sub').textContent = PAGES[name][0];
+  document.getElementById('hint').textContent = PAGES[name][1];
+  if (name === 'overlay') {
+    // The overlay covers everything: no header, background dimmed.
+    document.getElementById('head').style.display = 'none';
+    document.getElementById('stage').style.padding = '0';
+  }
+  // PIN boxes grouped dd mm hh mm; two digits typed in the demo.
+  document.querySelectorAll('[data-pin-boxes]').forEach(box => {
+    const typed = name === 'pin' ? '25' : '';
+    for (let i = 0; i < 8; i++) {
+      if (i > 0 && i % 2 === 0) box.insertAdjacentHTML('beforeend', '<span class="grp"></span>');
+      const cls = i === typed.length ? 'pin-box next' : 'pin-box';
+      box.insertAdjacentHTML('beforeend', `<span class="${cls}">${typed[i] || ''}</span>`);
+    }
+  });
+  document.querySelectorAll('[data-keys]').forEach(keys => {
+    ['1', '2', '3', '4', '5', '6', '7', '8', '9', '⌫', '0', 'OK'].forEach((k, i) => {
+      const cls = ['key', k === '⌫' || k === 'OK' ? 'word' : '', k === 'OK' ? 'ok' : '', i === (name === 'pin' ? 4 : 0) ? 'is-focused' : ''].join(' ');
+      keys.insertAdjacentHTML('beforeend', `<span class="${cls}">${k}</span>`);
+    });
+  });
+</script>
+</body>
+</html>

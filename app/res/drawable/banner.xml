@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Leanback banner (320x180): clock mark on the home screen's purple-pink gradient. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="180dp"
+    android:viewportWidth="320"
+    android:viewportHeight="180">
+    <path
+        android:fillColor="#2A1E6E"
+        android:pathData="M0,0h320v180h-320z" />
+    <path
+        android:fillColor="#E0408A"
+        android:fillAlpha="0.75"
+        android:pathData="M320,0v110a140,140 0 0 1 -150,-110z" />
+    <path
+        android:fillColor="#16A6B6"
+        android:fillAlpha="0.6"
+        android:pathData="M320,180h-130a120,120 0 0 1 130,-90z" />
+    <path
+        android:pathData="M90,50a40,40 0 1 1 0,80a40,40 0 1 1 0,-80z"
+        android:strokeWidth="7"
+        android:strokeColor="#FFFFFF" />
+    <path
+        android:pathData="M90,68v24l15,9"
+        android:strokeWidth="7"
+        android:strokeColor="#FFFFFF"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M150,72h110a8,8 0 0 1 0,16h-110a8,8 0 0 1 0,-16z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:fillAlpha="0.6"
+        android:pathData="M150,98h70a6,6 0 0 1 0,12h-70a6,6 0 0 1 0,-12z" />
+</vector>
