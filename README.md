@@ -125,11 +125,11 @@ Home; với launcher khác dùng `pm enable <gói>` + `set-home-activity`. Gỡ 
 ## Dùng với AI (Claude, ChatGPT, Gemini…)
 
 Dán link repo này vào AI kèm yêu cầu. AI có thể đọc [`AGENTS.md`](AGENTS.md) để biết đọc gì và theo quy tắc nào;
-design system nằm trong [`design/`](design/). Thay `<LINK>` bằng link repo của bạn:
+design system nằm trong [`design/`](design/). Copy nguyên câu lệnh dưới đây (đã có sẵn link repo), chỉ thay phần trong `<...>`:
 
 **Thiết kế màn hình mới cùng phong cách**
 ```
-Đọc design system tại <LINK> (bắt đầu từ AGENTS.md, rồi design/DESIGN.md và design/tokens/tokens.json,
+Đọc design system tại https://github.com/tuanpa-1702/restore-your-tivi (bắt đầu từ AGENTS.md, rồi design/DESIGN.md và design/tokens/tokens.json,
 xem mẫu trong design/reference/ và ảnh trong design/screenshots/).
 Thiết kế màn hình "<tên màn hình>" cho TV theo đúng design system đó: sân khấu 960x540, nền mesh "Tím hồng",
 thẻ kính, focus nền kem viền xanh, chữ Roboto, điều khiển bằng remote. Xuất ra một file HTML độc lập.
@@ -137,25 +137,25 @@ thẻ kính, focus nền kem viền xanh, chữ Roboto, điều khiển bằng r
 
 **Thêm widget vào màn hình chính**
 ```
-Theo design system ở <LINK>, thiết kế thêm thẻ "<tên widget>" thay cho thẻ thời tiết trên màn hình chính
+Theo design system ở https://github.com/tuanpa-1702/restore-your-tivi, thiết kế thêm thẻ "<tên widget>" thay cho thẻ thời tiết trên màn hình chính
 (cùng kích thước, kiểu thẻ kính, tiêu đề 15dp, có huy hiệu icon). Dựa trên design/reference/home.html.
 ```
 
 **Dựng lại bằng nền tảng khác**
 ```
-Dùng design system ở <LINK> để dựng lại màn hình chính bằng <Jetpack Compose / Flutter / SwiftUI / Figma>.
+Dùng design system ở https://github.com/tuanpa-1702/restore-your-tivi để dựng lại màn hình chính bằng <Jetpack Compose / Flutter / SwiftUI / Figma>.
 Giữ nguyên token màu, cỡ chữ, bo góc, kiểu focus và sân khấu 960x540 phóng đều theo màn hình.
 ```
 
 **Nhờ AI cài lên TV** (AI có quyền chạy lệnh như Claude Code, Codex, Cursor)
 ```
-Clone <LINK>, đọc AGENTS.md và README.md. TV box của tôi ở IP <192.168.1.50>, đã bật USB debugging.
+Clone https://github.com/tuanpa-1702/restore-your-tivi, đọc AGENTS.md và README.md. TV box của tôi ở IP <192.168.1.50>, đã bật USB debugging.
 Build bằng build.ps1, cài bằng install.ps1, chụp màn hình kiểm tra. Hỏi tôi trước khi đặt làm Home mặc định
 hoặc tắt launcher cũ; chỉ tắt (pm disable-user), không gỡ ứng dụng hệ thống.
 ```
 
 Thêm prompt và mẹo: [`design/PROMPT.md`](design/PROMPT.md). AI không mở được link repo thì dán link file thô
-`https://raw.githubusercontent.com/<chủ-repo>/<tên-repo>/main/design/DESIGN.md`.
+`https://raw.githubusercontent.com/tuanpa-1702/restore-your-tivi/main/design/DESIGN.md`.
 
 ---
 
