@@ -44,7 +44,8 @@ public class MainActivity extends Activity {
     private CalendarCardView calendar;
     private WeatherCardView weather;
     private int focusedTile;
-    private boolean topBarFocused;
+    /** Id of the focused card or top-bar button when Home was left; 0 when focus was on the dock. */
+    private int focusedId;
     private int moving = -1;
     private int weatherRequest;
     private boolean resumed;
@@ -80,6 +81,12 @@ public class MainActivity extends Activity {
         lunar = findViewById(R.id.lunar);
         calendar = findViewById(R.id.calendar);
         weather = findViewById(R.id.weather);
+        calendar.setOnClickListener(v -> startActivity(new Intent(this, CalendarActivity.class)));
+        weather.setOnClickListener(v -> startActivity(new Intent(this, WeatherActivity.class)));
+        calendar.setNextFocusUpId(R.id.btn_lock);
+        weather.setNextFocusUpId(R.id.btn_wifi);
+        calendar.setNextFocusRightId(R.id.weather);
+        weather.setNextFocusLeftId(R.id.calendar);
 
         lockStatus = findViewById(R.id.lock_status);
         lock = findViewById(R.id.btn_lock);
@@ -125,7 +132,8 @@ public class MainActivity extends Activity {
         greeting.setText(g.isEmpty() ? "Xin chào" : g);
         refreshDate();
         buildDock();
-        if (topBarFocused) lock.requestFocus();
+        View remembered = focusedId != 0 ? findViewById(focusedId) : null;
+        if (remembered != null) remembered.requestFocus();
         else focusTile(focusedTile);
         LockService.sync(this);
         refreshLock();
@@ -141,9 +149,9 @@ public class MainActivity extends Activity {
         unregisterReceiver(timeReceiver);
         handler.removeCallbacks(weatherTick);
         View focus = getCurrentFocus();
-        topBarFocused = focus == lock || focus == wifi;
         int i = focus == null ? -1 : dockRow.indexOfChild(focus);
         if (i >= 0) focusedTile = i;
+        focusedId = focus == lock || focus == wifi || focus == calendar || focus == weather ? focus.getId() : 0;
     }
 
     @Override
@@ -161,7 +169,7 @@ public class MainActivity extends Activity {
     protected void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if (moving >= 0) finishMove();
-        topBarFocused = false;
+        focusedId = 0;
         focusedTile = 0;
         focusTile(0);
     }
@@ -187,11 +195,13 @@ public class MainActivity extends Activity {
             dockRow.addView(t, lp);
         }
         bindTiles();
-        int first = dockRow.getChildAt(0).getId(), last = dockRow.getChildAt(dock.size() - 1).getId();
-        lock.setNextFocusDownId(first);
-        wifi.setNextFocusDownId(last);
+        int half = (dock.size() + 1) / 2;
+        lock.setNextFocusDownId(R.id.calendar);
+        wifi.setNextFocusDownId(R.id.weather);
+        calendar.setNextFocusDownId(dockRow.getChildAt(0).getId());
+        weather.setNextFocusDownId(dockRow.getChildAt(Math.min(half, dock.size() - 1)).getId());
         for (int i = 0; i < dock.size(); i++) {
-            dockRow.getChildAt(i).setNextFocusUpId(i < (dock.size() + 1) / 2 ? R.id.btn_lock : R.id.btn_wifi);
+            dockRow.getChildAt(i).setNextFocusUpId(i < half ? R.id.calendar : R.id.weather);
         }
     }
 

@@ -63,6 +63,16 @@
             android:windowSoftInputMode="adjustPan" />
 
         <activity
+            android:name=".CalendarActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".WeatherActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <activity
             android:name=".ChildLockActivity"
             android:exported="false"
             android:launchMode="singleTask"

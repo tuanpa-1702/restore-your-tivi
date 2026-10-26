@@ -14,9 +14,13 @@ phong cách.
 | ![Khoá trẻ em: chọn thời gian](design/screenshots/04-child-lock-pick.png) | ![Khoá trẻ em: đang hẹn giờ](design/screenshots/05-child-lock-active.png) |
 | ![Nhập mã PIN](design/screenshots/06-child-lock-pin.png) | ![Màn khoá khi hết giờ](design/screenshots/07-child-lock-overlay.png) |
 
+| | |
+|---|---|
+| ![Lịch âm dương](design/screenshots/09-calendar.png) | ![Thời tiết chi tiết](design/screenshots/10-weather.png) |
+
 ![Bàn phím Tivi (Telex)](design/screenshots/08-keyboard.png)
 
-*(Ảnh 01–07 render từ bản mẫu HTML trong `design/reference/`, cùng bố cục với app chạy trên TV; ảnh bàn phím chụp từ TV.)*
+*(Ảnh 01–07 render từ bản mẫu HTML trong `design/reference/`, cùng bố cục với app chạy trên TV; ảnh bàn phím, lịch và thời tiết chụp từ TV.)*
 
 ---
 
@@ -33,6 +37,21 @@ phong cách.
   30 phút một lần; mất mạng thì giữ số liệu cũ và ghi "mất kết nối", tự thử lại sau 2 phút.
 - **Thẻ lịch và thẻ thời tiết rộng bằng nhau**; **3 màu nền**: Tím hồng (mặc định), Đại dương, Hoàng hôn.
 - Nút **Wi-Fi** mở cài đặt Wi-Fi.
+
+### Màn Lịch âm dương (chọn thẻ lịch trên Home, bấm OK)
+- **Bên trái — thông tin ngày đang chọn:** thứ, ngày dương; ngày âm ("17 tháng Chín", tháng nhuận nếu có); năm Can Chi;
+  **ngày và tháng Can Chi**; **tiết khí**; ngày **hoàng đạo / hắc đạo** (tên sao: Thanh Long, Kim Quỹ, Bạch Hổ…);
+  **xung tuổi**; **6 giờ hoàng đạo** kèm khung giờ; **ngày lễ** dương lịch và âm lịch (Tết, Giỗ Tổ, Vu Lan, Trung thu…).
+- **Bên phải — lịch tháng lớn:** ngày âm dưới mỗi ngày dương, chấm xanh = ngày hoàng đạo, chấm vàng = ngày lễ, mùng 1
+  và rằm tô vàng, khung xanh = hôm nay. ◀ ▶ ▲ ▼ chọn ngày (tự sang tháng), **CH+ / CH−** (hoặc ⏪ ⏩) đổi tháng,
+  **OK** về hôm nay.
+
+### Màn Thời tiết (chọn thẻ thời tiết, bấm OK)
+- **Hiện tại:** biểu tượng và nhiệt độ lớn, tình trạng trời, cao/thấp, cảm giác như, độ ẩm, gió, khả năng mưa,
+  **chỉ số UV**, giờ **mặt trời mọc / lặn**.
+- **Theo giờ:** 16 giờ tới (mỗi 2 giờ) với nhiệt độ và khả năng mưa.
+- **7 ngày tới:** thứ/ngày, biểu tượng, khả năng mưa, thanh nhiệt độ thấp–cao trên cùng một thang cho cả tuần.
+- OK để làm mới; dữ liệu cũ hơn 30 phút tự tải lại.
 
 ### Dock và màn Ứng dụng
 - Dock **1–6 ô**, chứa app bất kỳ hoặc lối tắt (Cài đặt Android, Ứng dụng, Cài đặt giao diện). Mặc định: YouTube, Cửa
@@ -94,7 +113,7 @@ tivihome/          <- repo này
    mạng** nếu có) trong Tuỳ chọn nhà phát triển.
 2. **Build** (chạy test âm lịch trước khi build):
    ```powershell
-   powershell -ExecutionPolicy Bypass -File build.ps1 -VersionCode 15 -VersionName 1.6.1
+   powershell -ExecutionPolicy Bypass -File build.ps1 -VersionCode 16 -VersionName 1.7
    ```
    Bộ công cụ ở chỗ khác thì thêm `-BuildTools D:\duong\dan\buildtools`. Lần đầu tạo khoá ký `debug.keystore` —
    **giữ file này** (đã nằm trong `.gitignore`): mất khoá thì bản sau không cài đè được.

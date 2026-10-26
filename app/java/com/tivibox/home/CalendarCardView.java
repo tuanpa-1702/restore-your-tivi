@@ -30,6 +30,15 @@ public class CalendarCardView extends View {
     public CalendarCardView(Context context, AttributeSet attrs) {
         super(context, attrs);
         dp = context.getResources().getDisplayMetrics().density;
+        setFocusable(true);
+        setClickable(true);
+        setContentDescription("Lịch, mở lịch âm dương");
+    }
+
+    @Override
+    protected void onFocusChanged(boolean focused, int direction, android.graphics.Rect previous) {
+        super.onFocusChanged(focused, direction, previous);
+        Glass.animateFocus(this, focused);
     }
 
     /** month is 1..12. */
@@ -60,6 +69,7 @@ public class CalendarCardView extends View {
     protected void onDraw(Canvas canvas) {
         float w = getWidth(), h = getHeight(), pad = 16 * dp;
         Glass.card(canvas, paint, rect, w, h, dp);
+        if (isFocused()) Glass.focusRing(canvas, paint, rect, w, h, dp);
         if (year == 0) return;
 
         float titleBase = pad + 14 * dp;

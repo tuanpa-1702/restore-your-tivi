@@ -20,15 +20,25 @@ import java.util.Locale;
 final class Weather {
     private static final String FORECAST = "https://api.open-meteo.com/v1/forecast?latitude=%.4f&longitude=%.4f"
             + "&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,is_day"
-            + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"
-            + "&timezone=auto&forecast_days=5";
+            + "&hourly=temperature_2m,weather_code,precipitation_probability,is_day"
+            + "&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,"
+            + "sunrise,sunset,uv_index_max,wind_speed_10m_max"
+            + "&timezone=auto&forecast_days=7";
     private static final String GEOCODE = "https://geocoding-api.open-meteo.com/v1/search?count=8&language=vi&format=json&name=";
 
     static final class Day {
         String date; // yyyy-MM-dd
         int code;
-        double max, min;
+        double max, min, uv = Double.NaN, windMax = Double.NaN;
         int rain; // max precipitation probability, -1 when unknown
+        String sunrise = "", sunset = ""; // HH:mm local time
+    }
+
+    static final class Hour {
+        String time; // yyyy-MM-ddTHH:mm
+        double temp;
+        int code, rain;
+        boolean day;
     }
 
     static final class Place {
@@ -48,6 +58,9 @@ final class Weather {
     boolean day;
     long fetchedAt;
     final List<Day> days = new ArrayList<>();
+    /** Hourly forecast; empty for caches saved by older versions. */
+    final List<Hour> hours = new ArrayList<>();
+    String currentTime = ""; // yyyy-MM-ddTHH:mm of the "current" block
 
     Day dayFor(String isoDate) {
         for (Day d : days) if (d.date.equals(isoDate)) return d;
@@ -76,6 +89,8 @@ final class Weather {
             JSONArray max = daily.optJSONArray("temperature_2m_max");
             JSONArray min = daily.optJSONArray("temperature_2m_min");
             JSONArray rain = daily.optJSONArray("precipitation_probability_max");
+            JSONArray sunrise = daily.optJSONArray("sunrise"), sunset = daily.optJSONArray("sunset");
+            JSONArray uv = daily.optJSONArray("uv_index_max"), wind = daily.optJSONArray("wind_speed_10m_max");
             for (int i = 0; i < time.length(); i++) {
                 Day d = new Day();
                 d.date = time.getString(i);
@@ -83,7 +98,27 @@ final class Weather {
                 d.max = max == null ? Double.NaN : max.optDouble(i, Double.NaN);
                 d.min = min == null ? Double.NaN : min.optDouble(i, Double.NaN);
                 d.rain = rain == null ? -1 : rain.optInt(i, -1);
+                d.sunrise = clock(sunrise == null ? "" : sunrise.optString(i, ""));
+                d.sunset = clock(sunset == null ? "" : sunset.optString(i, ""));
+                d.uv = uv == null ? Double.NaN : uv.optDouble(i, Double.NaN);
+                d.windMax = wind == null ? Double.NaN : wind.optDouble(i, Double.NaN);
                 w.days.add(d);
+            }
+        }
+        w.currentTime = cur.optString("time", "");
+        JSONObject hourly = o.optJSONObject("hourly");
+        if (hourly != null) {
+            JSONArray time = hourly.getJSONArray("time");
+            JSONArray temp = hourly.optJSONArray("temperature_2m"), codes = hourly.optJSONArray("weather_code");
+            JSONArray rain = hourly.optJSONArray("precipitation_probability"), isDay = hourly.optJSONArray("is_day");
+            for (int i = 0; i < time.length(); i++) {
+                Hour h = new Hour();
+                h.time = time.getString(i);
+                h.temp = temp == null ? Double.NaN : temp.optDouble(i, Double.NaN);
+                h.code = codes == null ? 3 : codes.optInt(i, 3);
+                h.rain = rain == null ? -1 : rain.optInt(i, -1);
+                h.day = isDay == null || isDay.optInt(i, 1) == 1;
+                w.hours.add(h);
             }
         }
         return w;
@@ -154,6 +189,23 @@ final class Weather {
             case 95: case 96: case 99: return Glyphs.THUNDER;
             default: return Glyphs.CLOUD;
         }
+    }
+
+    /** "2026-10-26T05:48" → "05:48". */
+    private static String clock(String iso) {
+        int t = iso.indexOf('T');
+        return t >= 0 && iso.length() >= t + 6 ? iso.substring(t + 1, t + 6) : "";
+    }
+
+    /** Hours from the current one onwards (at most `count`). */
+    List<Hour> upcoming(int count) {
+        List<Hour> out = new ArrayList<>();
+        String from = currentTime.length() >= 13 ? currentTime.substring(0, 13) : "";
+        for (Hour h : hours) {
+            if (out.size() >= count) break;
+            if (from.isEmpty() || h.time.compareTo(from) >= 0) out.add(h);
+        }
+        return out;
     }
 
     static String stripAccents(String s) {

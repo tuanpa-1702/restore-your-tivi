@@ -31,6 +31,27 @@ final class Glass {
         p.setStyle(Paint.Style.FILL);
     }
 
+    /**
+     * Focus ring for cards that open a full screen (calendar, weather): the card keeps its glass so the white text
+     * stays readable, and gets the standard 3dp green ring.
+     */
+    static void focusRing(Canvas c, Paint p, RectF r, float w, float h, float dp) {
+        p.setShader(null);
+        p.setStyle(Paint.Style.STROKE);
+        p.setStrokeWidth(3 * dp);
+        p.setColor(0xFF8EE08F);
+        r.set(1.5f * dp, 1.5f * dp, w - 1.5f * dp, h - 1.5f * dp);
+        c.drawRoundRect(r, 18 * dp, 18 * dp, p);
+        p.setStyle(Paint.Style.FILL);
+    }
+
+    /** Scale-up used by focusable cards. */
+    static void animateFocus(android.view.View v, boolean focused) {
+        float s = focused ? 1.02f : 1f;
+        v.animate().scaleX(s).scaleY(s).setDuration(150).start();
+        v.invalidate();
+    }
+
     /** Baseline that vertically centres `p`'s text on `centerY`. */
     static float baseline(Paint p, float centerY) {
         Paint.FontMetrics fm = p.getFontMetrics();
