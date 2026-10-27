@@ -86,6 +86,50 @@ final class Prefs {
         sp.edit().remove("lock_deadline").remove("locked").apply();
     }
 
+    /** Home wallpaper blur: 0 sharp, 1 light, 2 strong. */
+    int wallpaperBlur() {
+        return sp.getInt("wallpaper_blur", 1);
+    }
+
+    void setWallpaperBlur(int level) {
+        sp.edit().putInt("wallpaper_blur", level).apply();
+    }
+
+    /** Home wallpaper layout: false fills the screen (crops the edges), true fits the whole photo. */
+    boolean wallpaperFit() {
+        return sp.getBoolean("wallpaper_fit", false);
+    }
+
+    void setWallpaperFit(boolean fit) {
+        sp.edit().putBoolean("wallpaper_fit", fit).apply();
+    }
+
+    /** Screensaver template: 0 clock, 1 lunar, 2 weather, 3 night, 4 wallpaper, 5 custom slideshow. */
+    int saverTemplate() {
+        return sp.getInt("saver_template", 0);
+    }
+
+    void setSaverTemplate(int t) {
+        sp.edit().putInt("saver_template", t).apply();
+    }
+
+    /** Seconds each photo stays on screen in the custom slideshow. */
+    int saverInterval() {
+        return sp.getInt("saver_interval", 30);
+    }
+
+    void setSaverInterval(int seconds) {
+        sp.edit().putInt("saver_interval", seconds).apply();
+    }
+
+    boolean saverClock() {
+        return sp.getBoolean("saver_clock", true);
+    }
+
+    void setSaverClock(boolean on) {
+        sp.edit().putBoolean("saver_clock", on).apply();
+    }
+
     boolean hasPlace() {
         return sp.contains("lat") && sp.contains("lon");
     }

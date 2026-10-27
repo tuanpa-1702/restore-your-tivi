@@ -8,6 +8,13 @@
     <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE" />
+    <!-- Wallpaper and screensaver photos from the TV's storage and USB drives. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+    <!-- Screensaver settings: idle time (WRITE_SETTINGS) and choosing the system screensaver
+         (WRITE_SECURE_SETTINGS); both only work once granted over ADB by install.ps1. -->
+    <uses-permission android:name="android.permission.WRITE_SETTINGS" />
+    <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
 
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
@@ -61,6 +68,35 @@
             android:exported="false"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="adjustPan" />
+
+        <activity
+            android:name=".ImagePickerActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".ScreensaverSettingsActivity"
+            android:exported="true"
+            android:screenOrientation="landscape" />
+
+        <activity
+            android:name=".ScreensaverPreviewActivity"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <service
+            android:name=".TiviDream"
+            android:exported="true"
+            android:label="Màn hình chờ Tivi Home"
+            android:permission="android.permission.BIND_DREAM_SERVICE">
+            <intent-filter>
+                <action android:name="android.service.dreams.DreamService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <meta-data
+                android:name="android.service.dream"
+                android:resource="@xml/dream" />
+        </service>
 
         <activity
             android:name=".CalendarActivity"

@@ -7,7 +7,8 @@ import android.graphics.RectF;
 
 /** Small canvas-drawn icons, so the launcher ships no bitmaps. UI thread only (shared Paint). */
 final class Glyphs {
-    static final int YOUTUBE = 1, STORE = 2, GEAR = 3, GRID = 4, PALETTE = 5, WIFI = 6, LOCK = 7;
+    static final int YOUTUBE = 1, STORE = 2, GEAR = 3, GRID = 4, PALETTE = 5, WIFI = 6, LOCK = 7,
+            FOLDER = 8, PHOTOS = 9, DRIVE = 21, UP = 22;
     static final int SUN = 10, MOON = 11, SUN_CLOUD = 12, MOON_CLOUD = 13, CLOUD = 14,
             FOG = 15, DRIZZLE = 16, RAIN = 17, SNOW = 18, THUNDER = 19;
 
@@ -75,6 +76,42 @@ final class Glyphs {
                 c.drawLine(cx + .17f * s, cy - .17f * s, cx + .17f * s, cy - .04f * s, P);
                 fill(color);
                 c.drawCircle(cx, cy + .14f * s, .055f * s, P);
+                break;
+            case FOLDER:
+                PATH.reset();
+                PATH.moveTo(cx - .36f * s, cy + .28f * s);
+                PATH.lineTo(cx - .36f * s, cy - .26f * s);
+                PATH.lineTo(cx - .1f * s, cy - .26f * s);
+                PATH.lineTo(cx - .02f * s, cy - .15f * s);
+                PATH.lineTo(cx + .36f * s, cy - .15f * s);
+                PATH.lineTo(cx + .36f * s, cy + .28f * s);
+                PATH.close();
+                c.drawPath(PATH, P);
+                break;
+            case PHOTOS:
+                R.set(cx - .34f * s, cy - .26f * s, cx + .34f * s, cy + .26f * s);
+                c.drawRoundRect(R, .06f * s, .06f * s, P);
+                PATH.reset();
+                PATH.moveTo(cx - .3f * s, cy + .2f * s);
+                PATH.lineTo(cx - .07f * s, cy - .02f * s);
+                PATH.lineTo(cx + .07f * s, cy + .1f * s);
+                PATH.lineTo(cx + .17f * s, cy + .01f * s);
+                PATH.lineTo(cx + .3f * s, cy + .13f * s);
+                c.drawPath(PATH, P);
+                fill(color);
+                c.drawCircle(cx - .13f * s, cy - .1f * s, .055f * s, P);
+                break;
+            case DRIVE:
+                R.set(cx - .36f * s, cy - .14f * s, cx + .36f * s, cy + .18f * s);
+                c.drawRoundRect(R, .07f * s, .07f * s, P);
+                c.drawLine(cx - .24f * s, cy + .02f * s, cx + .04f * s, cy + .02f * s, P);
+                fill(color);
+                c.drawCircle(cx + .2f * s, cy + .02f * s, .045f * s, P);
+                break;
+            case UP:
+                c.drawLine(cx, cy + .28f * s, cx, cy - .26f * s, P);
+                c.drawLine(cx - .2f * s, cy - .06f * s, cx, cy - .26f * s, P);
+                c.drawLine(cx + .2f * s, cy - .06f * s, cx, cy - .26f * s, P);
                 break;
             case WIFI: {
                 float by = cy + .24f * s;

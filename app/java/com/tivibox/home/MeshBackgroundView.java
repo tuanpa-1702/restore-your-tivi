@@ -39,6 +39,7 @@ public class MeshBackgroundView extends View {
 
     public void setTheme(int theme) {
         theme = Math.max(0, Math.min(BASE.length - 1, theme));
+        invalidate(); // the wallpaper may have changed even when the theme did not
         if (theme == this.theme && cache != null) return;
         this.theme = theme;
         cache = null;
@@ -53,12 +54,21 @@ public class MeshBackgroundView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         if (getWidth() == 0 || getHeight() == 0) return;
-        if (cache == null) cache = render(Math.max(1, getWidth() / 2), Math.max(1, getHeight() / 2));
         dst.set(0, 0, getWidth(), getHeight());
+        // A home wallpaper chosen in "Cài đặt giao diện" replaces the gradient; the glass cards sit on top of it.
+        Prefs prefs = new Prefs(getContext());
+        Bitmap photo = Photos.wallpaper(getContext(), getWidth(), getHeight(), prefs.wallpaperBlur(), prefs.wallpaperFit());
+        if (photo != null) {
+            canvas.drawBitmap(photo, null, dst, paint);
+            return;
+        }
+        if (cache == null) cache = render(theme, Math.max(1, getWidth() / 2), Math.max(1, getHeight() / 2));
         canvas.drawBitmap(cache, null, dst, paint);
     }
 
-    private Bitmap render(int w, int h) {
+    /** The mesh gradient of `theme` at w x h (also used by the screensaver). */
+    static Bitmap render(int theme, int w, int h) {
+        theme = Math.max(0, Math.min(BASE.length - 1, theme));
         Bitmap b = Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888);
         Canvas c = new Canvas(b);
         c.drawColor(BASE[theme]);

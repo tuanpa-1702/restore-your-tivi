@@ -29,14 +29,17 @@ public class SettingsActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final ExecutorService io = Executors.newSingleThreadExecutor();
     private Prefs prefs;
-    private LinearLayout rows;
+    private CardGrid grid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_settings);
         prefs = new Prefs(this);
-        rows = findViewById(R.id.rows);
+        grid = new CardGrid(this, findViewById(R.id.rows));
+        TextView footer = findViewById(R.id.footer);
+        footer.setText("Tivi Home V" + versionName() + " · Developed by TuanPA");
+        footer.setVisibility(View.VISIBLE);
     }
 
     @Override
@@ -52,33 +55,75 @@ public class SettingsActivity extends Activity {
     }
 
     private void buildRows() {
-        View focus = getCurrentFocus();
-        int keep = focus == null ? 0 : Math.max(0, rows.indexOfChild(focus));
+        int keep = grid.focusedIndex();
         ((MeshBackgroundView) findViewById(R.id.background)).setTheme(prefs.theme());
-        rows.removeAllViews();
+        grid.clear();
+        boolean photo = Photos.wallpaperFile(this).exists();
         row("Lời chào", prefs.greeting(), this::editGreeting);
-        row("Vị trí thời tiết", prefs.hasPlace() ? prefs.placeName() : "Chưa chọn — bấm để nhập thành phố hoặc quận/huyện",
+        row("Vị trí thời tiết", prefs.hasPlace() ? prefs.placeName() : "Chưa chọn — bấm để nhập thành phố, quận/huyện",
                 this::editPlace);
-        row("Màu nền", MeshBackgroundView.THEME_NAMES[Math.max(0, Math.min(2, prefs.theme()))], this::pickTheme);
-        row("Ứng dụng trên dock", dockSummary(), () -> DockEditor.pick(this, prefs, this::buildRows));
-        row("Sắp xếp", "Giữ OK trên một ô ở màn hình chính hoặc trong Ứng dụng để di chuyển. Bấm để đặt lại thứ tự.",
-                this::resetOrder);
+        row("Ảnh nền màn hình chính", photo
+                        ? "Đang dùng ảnh · " + BLUR_NAMES[prefs.wallpaperBlur()] + " · " + (prefs.wallpaperFit() ? "vừa khung" : "lấp đầy")
+                        : "Không dùng — bấm để chọn ảnh từ TV hoặc USB",
+                this::wallpaperMenu);
+        row("Màu nền", MeshBackgroundView.THEME_NAMES[Math.max(0, Math.min(2, prefs.theme()))]
+                + (photo ? " · hiện khi bỏ ảnh nền" : ""), this::pickTheme);
+        row("Màn hình chờ", ScreensaverView.NAMES[prefs.saverTemplate()] + " · chờ " + ScreensaverSettingsActivity.timeoutText(this),
+                () -> startActivity(new Intent(this, ScreensaverSettingsActivity.class)));
         row("Khoá trẻ em", ChildLock.canCoverApps(this)
-                        ? "Hẹn giờ 15 phút – 2 tiếng hoặc tuỳ chỉnh (đang đặt " + ChildLock.duration(prefs.customLockMinutes())
-                        + "). Cũng mở được bằng nút ổ khoá trên màn hình chính."
+                        ? "Hẹn giờ 15 phút – 2 tiếng hoặc tuỳ chỉnh (đang đặt " + ChildLock.duration(prefs.customLockMinutes()) + ")"
                         : "Chưa có quyền hiển thị trên ứng dụng khác — bấm để cấp",
                 () -> startActivity(new Intent(this, ChildLockActivity.class)));
+        row("Ứng dụng trên dock", dockSummary(), () -> DockEditor.pick(this, prefs, this::buildRows));
+        row("Sắp xếp", "Giữ OK trên một ô để di chuyển · bấm để đặt lại thứ tự", this::resetOrder);
         row("Cài đặt Android", "Wi-Fi, âm thanh, hiển thị, ứng dụng…", this::openAndroidSettings);
-        row("Giới thiệu", "Tivi Home " + versionName() + " · thời tiết Open-Meteo · âm lịch theo giờ Việt Nam", null);
-        rows.getChildAt(Math.min(keep, rows.getChildCount() - 1)).requestFocus();
+        grid.finish(keep);
+    }
+    private static final String[] BLUR_NAMES = {"Rõ nét", "Mờ nhẹ", "Mờ nhiều"};
+    private static final String[] FIT_NAMES = {"Lấp đầy màn hình (cắt mép)", "Vừa khung (không cắt ảnh)"};
+
+    private void wallpaperMenu() {
+        boolean has = Photos.wallpaperFile(this).exists();
+        String[] items = has
+                ? new String[]{"Chọn ảnh khác", "Độ mờ: " + BLUR_NAMES[prefs.wallpaperBlur()],
+                "Cách hiển thị: " + (prefs.wallpaperFit() ? FIT_NAMES[1] : FIT_NAMES[0]), "Bỏ ảnh nền (dùng màu nền)"}
+                : new String[]{"Chọn ảnh"};
+        new AlertDialog.Builder(this, DockEditor.DIALOG_THEME)
+                .setTitle("Ảnh nền màn hình chính")
+                .setItems(items, (d, which) -> {
+                    if (which == 0) {
+                        startActivity(ImagePickerActivity.open(this, ImagePickerActivity.MODE_WALLPAPER));
+                    } else if (which == 1) {
+                        new AlertDialog.Builder(this, DockEditor.DIALOG_THEME)
+                                .setTitle("Độ mờ ảnh nền")
+                                .setSingleChoiceItems(BLUR_NAMES, prefs.wallpaperBlur(), (d2, level) -> {
+                                    prefs.setWallpaperBlur(level);
+                                    d2.dismiss();
+                                    buildRows();
+                                })
+                                .setNegativeButton("Huỷ", null)
+                                .show();
+                    } else if (which == 2) {
+                        new AlertDialog.Builder(this, DockEditor.DIALOG_THEME)
+                                .setTitle("Cách hiển thị ảnh nền")
+                                .setSingleChoiceItems(FIT_NAMES, prefs.wallpaperFit() ? 1 : 0, (d2, mode) -> {
+                                    prefs.setWallpaperFit(mode == 1);
+                                    d2.dismiss();
+                                    buildRows();
+                                })
+                                .setNegativeButton("Huỷ", null)
+                                .show();
+                    } else {
+                        Photos.removeWallpaper(this);
+                        buildRows();
+                    }
+                })
+                .setNegativeButton("Huỷ", null)
+                .show();
     }
 
     private void row(String title, String value, Runnable click) {
-        View v = getLayoutInflater().inflate(R.layout.item_setting, rows, false);
-        ((TextView) v.findViewById(R.id.title)).setText(title);
-        ((TextView) v.findViewById(R.id.value)).setText(value);
-        if (click != null) v.setOnClickListener(x -> click.run());
-        rows.addView(v);
+        grid.add(title, value, click);
     }
 
     private String dockSummary() {
