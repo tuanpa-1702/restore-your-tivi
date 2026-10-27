@@ -70,7 +70,12 @@ phong cách.
 
 ### Cài đặt giao diện
 Là một ô trong màn Ứng dụng (thêm được vào dock), các thẻ xếp 2 cột: lời chào, vị trí thời tiết, ảnh nền, màu nền,
-màn hình chờ, khoá trẻ em, ứng dụng trên dock, đặt lại thứ tự, mở Cài đặt Android. Cuối trang ghi phiên bản.
+màn hình chờ, khoá trẻ em, ứng dụng trên dock, đặt lại thứ tự, dọn dẹp, mở Cài đặt Android. Cuối trang ghi phiên bản.
+
+**Dọn dẹp** (mới ở 1.8.1): hiện RAM và bộ nhớ trống thật của TV; *Giải phóng RAM* đóng ứng dụng chạy nền và báo số MB
+thực sự được giải phóng; *Xoá bộ nhớ đệm Tivi Home*; *Xoá bộ nhớ đệm ứng dụng khác* mở trang Bộ nhớ của TV. Android
+không cho app thường xoá bộ nhớ đệm của app khác, và từ Android 14 cũng không cho đóng app khác, nên trên Android 14
+nút Giải phóng RAM thường báo "RAM đã gọn".
 
 ### Ảnh nền màn hình chính (mới ở 1.8)
 - Ảnh nằm sau lớp kính mờ. **Tự quét mọi ảnh** trong bộ nhớ trong và USB, hiện thành lưới (mới nhất trước) kèm tên
@@ -136,7 +141,7 @@ tivihome/          <- repo này
    mạng** nếu có) trong Tuỳ chọn nhà phát triển.
 2. **Build** (chạy test âm lịch trước khi build):
    ```powershell
-   powershell -ExecutionPolicy Bypass -File build.ps1 -VersionCode 16 -VersionName 1.7
+   powershell -ExecutionPolicy Bypass -File build.ps1 -VersionCode 19 -VersionName 1.8.1
    ```
    Bộ công cụ ở chỗ khác thì thêm `-BuildTools D:\duong\dan\buildtools`. Lần đầu tạo khoá ký `debug.keystore` —
    **giữ file này** (đã nằm trong `.gitignore`): mất khoá thì bản sau không cài đè được.
@@ -164,7 +169,7 @@ Home; với launcher khác dùng `pm enable <gói>` + `set-home-activity`. Gỡ 
 
 ---
 
-## Dán đoạn prompt cho AI chạy trên máy tính như Claude Code, Codex hay Gemini CLI
+## Dùng với AI (Claude, ChatGPT, Gemini…)
 
 Dán link repo này vào AI kèm yêu cầu. AI có thể đọc [`AGENTS.md`](AGENTS.md) để biết đọc gì và theo quy tắc nào;
 design system nằm trong [`design/`](design/). Copy nguyên câu lệnh dưới đây (đã có sẵn link repo), chỉ thay phần trong `<...>`:
