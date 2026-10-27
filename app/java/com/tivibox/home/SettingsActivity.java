@@ -76,6 +76,7 @@ public class SettingsActivity extends Activity {
                 () -> startActivity(new Intent(this, ChildLockActivity.class)));
         row("Ứng dụng trên dock", dockSummary(), () -> DockEditor.pick(this, prefs, this::buildRows));
         row("Sắp xếp", "Giữ OK trên một ô để di chuyển · bấm để đặt lại thứ tự", this::resetOrder);
+        row("Dọn dẹp", Cleanup.summary(this), this::cleanupMenu);
         row("Cài đặt Android", "Wi-Fi, âm thanh, hiển thị, ứng dụng…", this::openAndroidSettings);
         grid.finish(keep);
     }
@@ -176,6 +177,61 @@ public class SettingsActivity extends Activity {
                 })
                 .setNegativeButton("Huỷ", null)
                 .show();
+    }
+
+    private void cleanupMenu() {
+        String[] items = {
+                "Giải phóng RAM (đóng ứng dụng chạy nền)",
+                "Xoá bộ nhớ đệm Tivi Home (" + Cleanup.size(Cleanup.ownCacheBytes(this)) + ")",
+                "Xoá bộ nhớ đệm ứng dụng khác… (mở Bộ nhớ của TV)"};
+        new AlertDialog.Builder(this, DockEditor.DIALOG_THEME)
+                .setTitle("Dọn dẹp · " + Cleanup.summary(this))
+                .setItems(items, (d, which) -> {
+                    if (which == 0) freeRam();
+                    else if (which == 1) {
+                        long before = Cleanup.ownCacheBytes(this);
+                        Cleanup.clearOwnCache(this);
+                        Toast.makeText(this, "Đã xoá " + Cleanup.size(before) + " bộ nhớ đệm của Tivi Home",
+                                Toast.LENGTH_SHORT).show();
+                        buildRows();
+                    } else openStorageSettings();
+                })
+                .setNegativeButton("Đóng", null)
+                .show();
+    }
+
+    private void freeRam() {
+        long before = Cleanup.memory(this).availMem;
+        Toast.makeText(this, "Đang đóng ứng dụng chạy nền…", Toast.LENGTH_SHORT).show();
+        io.execute(() -> {
+            Cleanup.closeBackgroundApps(this);
+            try {
+                Thread.sleep(1500); // let the system reclaim memory before measuring
+            } catch (InterruptedException e) {
+                return;
+            }
+            long freed = Cleanup.memory(this).availMem - before;
+            handler.post(() -> {
+                if (isDestroyed()) return;
+                Toast.makeText(this, freed >= (8L << 20)
+                                ? "Đã giải phóng " + Cleanup.size(freed) + " RAM"
+                                : "RAM đã gọn, không có ứng dụng nền nào để đóng thêm",
+                        Toast.LENGTH_LONG).show();
+                buildRows();
+            });
+        });
+    }
+
+    private void openStorageSettings() {
+        try {
+            startActivity(new Intent(Settings.ACTION_INTERNAL_STORAGE_SETTINGS));
+        } catch (ActivityNotFoundException e) {
+            try {
+                startActivity(new Intent(Settings.ACTION_APPLICATION_SETTINGS));
+            } catch (ActivityNotFoundException e2) {
+                openAndroidSettings();
+            }
+        }
     }
 
     private void openAndroidSettings() {

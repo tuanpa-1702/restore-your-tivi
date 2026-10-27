@@ -15,6 +15,8 @@
          (WRITE_SECURE_SETTINGS); both only work once granted over ADB by install.ps1. -->
     <uses-permission android:name="android.permission.WRITE_SETTINGS" />
     <uses-permission android:name="android.permission.WRITE_SECURE_SETTINGS" />
+    <!-- "Dọn dẹp": close background apps (Android 13 and older; Android 14 limits it to Tivi Home itself). -->
+    <uses-permission android:name="android.permission.KILL_BACKGROUND_PROCESSES" />
 
     <uses-feature android:name="android.software.leanback" android:required="false" />
     <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
