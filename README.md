@@ -164,7 +164,7 @@ Home; với launcher khác dùng `pm enable <gói>` + `set-home-activity`. Gỡ 
 
 ---
 
-## Dùng với AI (Claude, ChatGPT, Gemini…)
+## Dán đoạn prompt cho AI chạy trên máy tính như Claude Code, Codex hay Gemini CLI
 
 Dán link repo này vào AI kèm yêu cầu. AI có thể đọc [`AGENTS.md`](AGENTS.md) để biết đọc gì và theo quy tắc nào;
 design system nằm trong [`design/`](design/). Copy nguyên câu lệnh dưới đây (đã có sẵn link repo), chỉ thay phần trong `<...>`:
