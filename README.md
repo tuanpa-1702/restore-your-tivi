@@ -17,10 +17,18 @@ phong cách.
 | | |
 |---|---|
 | ![Lịch âm dương](design/screenshots/09-calendar.png) | ![Thời tiết chi tiết](design/screenshots/10-weather.png) |
+| ![Chọn ảnh nền](design/screenshots/11-wallpaper-picker.png) | ![Cài đặt màn hình chờ](design/screenshots/12-screensaver-settings.png) |
+
+**6 mẫu màn hình chờ**
+
+| | | |
+|---|---|---|
+| ![Đồng hồ kính](design/screenshots/14-saver-glass-clock.png) | ![Lịch âm dương](design/screenshots/15-saver-lunar.png) | ![Thời tiết](design/screenshots/16-saver-weather.png) |
+| ![Đêm tối giản](design/screenshots/17-saver-night.png) | ![Ảnh nền](design/screenshots/18-saver-wallpaper.png) | ![Tuỳ chỉnh (trình chiếu)](design/screenshots/19-saver-slideshow.png) |
 
 ![Bàn phím Tivi (Telex)](design/screenshots/08-keyboard.png)
 
-*(Ảnh 01–07 render từ bản mẫu HTML trong `design/reference/`, cùng bố cục với app chạy trên TV; ảnh bàn phím, lịch và thời tiết chụp từ TV.)*
+*(Ảnh chụp từ TV với ảnh nền demo; ảnh 05–07 render từ bản mẫu HTML trong `design/reference/`.)*
 
 ---
 
@@ -61,8 +69,22 @@ phong cách.
   *Thêm vào / Bỏ khỏi dock*, *Thông tin ứng dụng*. Thứ tự được nhớ; app mới cài xếp cuối theo tên.
 
 ### Cài đặt giao diện
-Là một ô trong màn Ứng dụng (thêm được vào dock): lời chào, vị trí thời tiết, màu nền, ứng dụng trên dock, đặt lại thứ
-tự, khoá trẻ em, mở Cài đặt Android.
+Là một ô trong màn Ứng dụng (thêm được vào dock), các thẻ xếp 2 cột: lời chào, vị trí thời tiết, ảnh nền, màu nền,
+màn hình chờ, khoá trẻ em, ứng dụng trên dock, đặt lại thứ tự, mở Cài đặt Android. Cuối trang ghi phiên bản.
+
+### Ảnh nền màn hình chính (mới ở 1.8)
+- Ảnh nằm sau lớp kính mờ. **Tự quét mọi ảnh** trong bộ nhớ trong và USB, hiện thành lưới (mới nhất trước) kèm tên
+  file và nơi lưu — không cần duyệt thư mục.
+- **Độ mờ**: Rõ nét / Mờ nhẹ / Mờ nhiều. **Cách hiển thị**: Lấp đầy (cắt cho kín màn) hoặc Vừa khung (hiện trọn ảnh,
+  phần thừa là nền mờ của chính ảnh). Bỏ ảnh nền thì quay về màu nền gradient.
+
+### Màn hình chờ (mới ở 1.8)
+- 6 mẫu: **Đồng hồ kính**, **Lịch âm dương** (kèm ngày lễ sắp tới), **Thời tiết**, **Đêm tối giản**, **Ảnh nền** và
+  **Tuỳ chỉnh** — trình chiếu tối đa 30 ảnh tự chọn, mỗi ảnh 10 giây – 5 phút, bật/tắt đồng hồ.
+- Nội dung trôi nhẹ mỗi phút để không lưu ảnh trên màn hình. Có nút **Xem thử**.
+- **Thời gian chờ** 5 phút – 1 giờ hoặc tắt; **Dùng làm màn hình chờ của TV** đặt Tivi Home làm screensaver hệ thống
+  (cần quyền mà `install.ps1` cấp qua ADB; thiếu quyền thì mở cài đặt màn hình chờ của TV).
+- Muốn trả lại màn hình chờ cũ: `adb shell settings put secure screensaver_components <gói>/<dream cũ>`.
 
 ### Khoá trẻ em
 - Nút **ổ khoá** góc trên bên phải, **mặc định tắt**. Chọn cho bé xem **15 phút, 30 phút, 1 tiếng, 2 tiếng** hoặc
@@ -89,10 +111,11 @@ tự, khoá trẻ em, mở Cài đặt Android.
 - Bàn phím chỉ chiếm nửa dưới màn hình, ô đang nhập vẫn nhìn thấy.
 
 ### Nhẹ và an toàn
-- APK ~85 KB, chỉ dùng Android framework (không AndroidX, không thư viện ngoài); không ảnh bitmap — icon và nền đều
-  vẽ bằng code; không blur. Hợp với TV box RAM 1 GB.
-- Quyền: `INTERNET` (chỉ để lấy thời tiết), `SYSTEM_ALERT_WINDOW` + foreground service (khoá trẻ em). Không quảng cáo,
-  không thu thập dữ liệu.
+- APK ~120 KB, chỉ dùng Android framework (không AndroidX, không thư viện ngoài); icon và nền vẽ bằng code; ảnh nền
+  được thu nhỏ và làm mờ một lần rồi lưu đệm. Hợp với TV box RAM 1 GB.
+- Quyền: `INTERNET` (chỉ để lấy thời tiết), `SYSTEM_ALERT_WINDOW` + foreground service (khoá trẻ em), đọc ảnh (ảnh nền,
+  trình chiếu), `WRITE_SETTINGS` / `WRITE_SECURE_SETTINGS` (màn hình chờ, cấp qua ADB). Không quảng cáo, không thu
+  thập dữ liệu.
 - Bố cục thiết kế trên sân khấu 960×540dp và phóng đều theo màn hình (720p, 1080p, 4K đều giống nhau).
 
 ---

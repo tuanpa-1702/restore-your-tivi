@@ -26,6 +26,11 @@ if ($LASTEXITCODE -ne 0) { throw 'pm install failed' }
 # Child lock covers other apps; write-settings makes the grant survive a reboot or a power cut.
 & $adb -s $serial shell appops set com.tivibox.home SYSTEM_ALERT_WINDOW allow
 & $adb -s $serial shell appops set --uid com.tivibox.home SYSTEM_ALERT_WINDOW allow
+# Wallpaper/screensaver photos, screensaver idle time and choosing Tivi Home as the system screensaver.
+# Each may be refused on some firmware; that only disables the matching shortcut in the app.
+& $adb -s $serial shell pm grant com.tivibox.home android.permission.READ_MEDIA_IMAGES
+& $adb -s $serial shell appops set com.tivibox.home WRITE_SETTINGS allow
+& $adb -s $serial shell pm grant com.tivibox.home android.permission.WRITE_SECURE_SETTINGS
 & $adb -s $serial shell appops write-settings
 & $adb -s $serial shell am start -n com.tivibox.home/.MainActivity
 Write-Host 'Installed and opened Tivi Home. The stock launcher is unchanged; press Home to go back to it.'
