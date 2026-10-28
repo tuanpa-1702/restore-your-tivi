@@ -5,6 +5,8 @@ Màn hình chính (launcher) cho **Android TV / TV box**, giao diện kính mờ
 cùng phong cách. Điều khiển hoàn toàn bằng remote,
 giao diện tiếng Việt. Kèm theo là **design system** đầy đủ để bạn — hoặc bất kỳ AI nào — thiết kế thêm màn hình cùng
 phong cách.
+Và từ bản này, cài lên TV chỉ cần **một file `.bat`** trên Windows: không Android Studio, không Gradle, không cài
+JDK/Android SDK trước.
 
 ![Màn hình chính](design/screenshots/01-home.png)
 
@@ -129,8 +131,62 @@ nút Giải phóng RAM thường báo "RAM đã gọn".
 - Bố cục thiết kế trên sân khấu 960×540dp và phóng đều theo màn hình (720p, 1080p, 4K đều giống nhau).
 
 ---
+## Cài nhanh: một file `.bat` trên Windows
 
-## Cài lên TV
+Tải [`Cai-Tivi-Home.bat`](Cai-Tivi-Home.bat), bỏ vào **một thư mục bất kỳ** (Desktop, Downloads, `D:\Tivi`, USB… —
+tên có dấu cách hay tiếng Việt đều được), rồi nháy đúp.
+
+| Bước | Việc xảy ra |
+|---|---|
+| 1 | Lần đầu, tool hỏi `Cai bo cong cu ngay bay gio? [Y/n]` → Enter |
+| 2 | Chọn **`A`** → nhập **IP của TV** (xem trên TV: Cài đặt → Mạng & Internet, hoặc Cài đặt → Thiết bị → Giới thiệu) |
+| 3 | Tool tự tải **JDK 17 + Android SDK 34** (~400 MB, chỉ lần đầu), tải mã nguồn, build APK, rồi cài lên TV |
+| 4 | Trên TV bấm **Cho phép** khi hiện hộp thoại *Allow USB debugging?* |
+| 5 | Vào `[3] → 3` để đặt Tivi Home làm Home, `[3] → 4` để tắt launcher cũ, `[4]` để dọn ứng dụng |
+
+Chế độ `[A]` chạy đúng thứ tự **1 → 5**: nhập IP → bộ công cụ → mã nguồn → build → cài lên TV.
+
+### Menu của tool
+
+| Mục | Chức năng |
+|---|---|
+| `[A]` | Cài tất cả trên máy mới: IP → JDK/SDK → mã nguồn → build → cài lên TV |
+| `[1]` | Chỉ cài bộ công cụ Windows (JDK 17 + Android SDK 34) vào `buildtools\` |
+| `[2]` | Tải mã nguồn (git clone hoặc ZIP) và build APK |
+| `[3]` | Bảng cài launcher: cài/cập nhật, xem app đang là Home, đặt Home, tắt launcher cũ, gỡ app, đổi IP |
+| `[4]` | Dọn dẹp: bảng 12 gói hệ thống, chọn gói cần tắt (chỉ `pm disable-user`, không gỡ) |
+| `[5]` | Khôi phục: bật lại CleanYourTV, bật lại nhóm gói đã tắt, bật một gói bất kỳ, gỡ app |
+| `[6]` | Bật Bàn phím Tivi (Telex) làm bàn phím hệ thống |
+| `[7]` | Sao lưu danh sách gói và cài đặt của TV vào `backup\` |
+| `[8]` | Kiểm tra môi trường: JDK, adb, SDK 34, APK, quyền đang chạy, thử kết nối TV |
+| `[9]` | Đổi IP TV (lưu vào `tivibox.cfg`) |
+| `[0]` | Thoát |
+
+### Yêu cầu
+
+- Windows 10 (1803 trở lên) hoặc Windows 11 — có sẵn `curl`, `tar`, PowerShell 5.1.
+- Khoảng **600 MB** dung lượng trống và mạng internet (lần đầu).
+- TV box **Android 8.0 trở lên**, cùng mạng LAN với máy tính, đã bật **Gỡ lỗi ADB qua mạng**.
+- **Không cần quyền Admin.** Tool chỉ ghi trong thư mục chứa file bat. Nếu cần quyền (thư mục bị chặn, hoặc adb không
+  tạo được `%USERPROFILE%\.android`), tool tự hỏi và tự hiện hộp thoại UAC đúng lúc đó.
+
+### Những gì được tạo ra
+
+```
+Cai-Tivi-Home.bat      file duy nhất bạn cần copy
+buildtools\            JDK 17 + Android SDK 34 (tự tải)
+restore-your-tivi\     mã nguồn (git clone hoặc ZIP)
+android-home\          nơi adb lưu khoá, dùng khi profile Windows bị chặn
+tivibox.cfg            IP TV đã nhớ
+tivibox-log.txt        nhật ký từng bước, dùng khi cần báo lỗi
+backup\                danh sách gói + settings trước khi sửa
+```
+
+Bản chạy CRLF được tạo trong `%LOCALAPPDATA%\TiviHome\` — không làm rác thư mục bạn chọn.
+
+---
+
+## Cài lên TV (thủ công bằng ADB shell):
 
 **Yêu cầu:** Android TV / TV box **Android 8.0 trở lên**, máy tính Windows cùng mạng, JDK 17 và Android SDK
 (platform `android-34`, build-tools `34.0.0`, platform-tools). Không cần Android Studio hay Gradle.
@@ -174,7 +230,7 @@ Home; với launcher khác dùng `pm enable <gói>` + `set-home-activity`. Gỡ 
 
 ---
 
-## Dùng với AI (Claude, ChatGPT, Gemini…)
+## Cài bằng cách promt cho AI (Claude Code, ChatGPT Codex, Gemini CLI…)
 
 Dán link repo này vào AI kèm yêu cầu. AI có thể đọc [`AGENTS.md`](AGENTS.md) để biết đọc gì và theo quy tắc nào;
 design system nằm trong [`design/`](design/). Copy nguyên câu lệnh dưới đây (đã có sẵn link repo), chỉ thay phần trong `<...>`:
