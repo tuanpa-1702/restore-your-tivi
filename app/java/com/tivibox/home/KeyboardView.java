@@ -18,7 +18,7 @@ import java.util.List;
  * KeyboardService edits the text.
  */
 public class KeyboardView extends View {
-    static final int CHAR = 0, BACKSPACE = 1, SHIFT = 2, SPACE = 3, DONE = 4, MODE = 5, SYMBOLS = 6;
+    static final int CHAR = 0, BACKSPACE = 1, SHIFT = 2, SPACE = 3, DONE = 4, MODE = 5, SYMBOLS = 6, MIC = 7;
 
     static final class Key {
         final int type;
@@ -50,7 +50,7 @@ public class KeyboardView extends View {
     private final List<List<Key>> symbols = new ArrayList<>();
     private List<List<Key>> rows = letters;
     private int row = 2, col = 0;
-    private boolean shift, vietnamese = true;
+    private boolean shift, vietnamese = true, listening;
     private Listener listener;
 
     public KeyboardView(Context context) {
@@ -78,13 +78,14 @@ public class KeyboardView extends View {
         symbols.add(bottomRow("ABC"));
     }
 
-    /** ?123 (or ABC on the symbol page), VI/ABC, comma, full stop, space, Done: 10 units like every row. */
+    /** ?123 (or ABC on the symbol page), VI/ABC, voice, comma, full stop, space, Done: 10 units like every row. */
     private static List<Key> bottomRow(String pageLabel) {
         List<Key> r = new ArrayList<>();
         r.add(new Key(SYMBOLS, "", pageLabel, 1.5f));
         r.add(new Key(MODE, "", "VI", 1));
+        r.add(new Key(MIC, "", "Nói", 1));
         r.addAll(chars(",."));
-        r.add(new Key(SPACE, " ", "dấu cách", 4));
+        r.add(new Key(SPACE, " ", "dấu cách", 3));
         r.add(new Key(DONE, "", "Xong", 1.5f));
         return r;
     }
@@ -113,6 +114,12 @@ public class KeyboardView extends View {
 
     void setVietnamese(boolean vietnamese) {
         this.vietnamese = vietnamese;
+        invalidate();
+    }
+
+    /** Amber "Nói" key while speech recognition is listening. */
+    void setListening(boolean listening) {
+        this.listening = listening;
         invalidate();
     }
 
@@ -203,19 +210,17 @@ public class KeyboardView extends View {
                 RectF b = k.bounds;
                 c.save();
                 c.translate(b.left, b.top);
-                if (at) {
-                    ChoiceView.drawCard(c, paint, rect, b.width(), b.height(), dp, true, false);
-                } else {
-                    int fill = k.type == DONE ? 0x4D8EE08F : (k.type == SHIFT && shift) ? 0xFFFFC857 : 0x21FFFFFF;
-                    Glass.panel(c, paint, rect, 0, 0, b.width(), b.height(), 10 * dp, dp, fill, 0x3DFFFFFF);
-                }
+                // Same shape and border as every key; the selected key only changes its fill to cream.
+                int fill = at ? 0xFFF3EEE8 : k.type == DONE ? 0x4D8EE08F
+                        : (k.type == SHIFT && shift) || (k.type == MIC && listening) ? 0xFFFFC857 : 0x21FFFFFF;
+                Glass.panel(c, paint, rect, 0, 0, b.width(), b.height(), 10 * dp, dp, fill, 0x3DFFFFFF);
                 c.restore();
                 String label = k.type == MODE ? (vietnamese ? "VI" : "ABC")
                         : k.label != null ? k.label : shift ? k.text.toUpperCase() : k.text;
                 boolean word = label.length() > 1;
                 paint.setTypeface(word ? medium : light);
                 paint.setTextSize((word ? 13 : 20) * dp);
-                paint.setColor(at || (k.type == SHIFT && shift) ? 0xFF15151C : 0xFFFFFFFF);
+                paint.setColor(at || (k.type == SHIFT && shift) || (k.type == MIC && listening) ? 0xFF15151C : 0xFFFFFFFF);
                 c.drawText(label, b.centerX(), Glass.baseline(paint, b.centerY()), paint);
             }
         }

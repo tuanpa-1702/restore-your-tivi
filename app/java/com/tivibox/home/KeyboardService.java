@@ -18,8 +18,12 @@ import android.widget.TextView;
  * which rewrites the word before the cursor (s f r x j tones, aa/aw/dd…); password, e-mail and URL fields start in ABC.
  */
 public class KeyboardService extends InputMethodService {
+    private static final String HINT = "◀ ▶ ▲ ▼ chọn phím · OK để gõ · Nói: gõ bằng giọng nói · Telex: s sắc · f huyền · "
+            + "r hỏi · x ngã · j nặng · aa â · aw ă · ow ơ · w ư · dd đ · Back để đóng";
     private KeyboardView keyboard;
     private MeshBackgroundView background;
+    private TextView hint;
+    private Dictation dictation;
 
     @Override
     public View onCreateInputView() {
@@ -44,10 +48,9 @@ public class KeyboardService extends InputMethodService {
         column.setGravity(Gravity.CENTER_HORIZONTAL);
         int pad = Math.round(12 * dp);
         column.setPadding(pad, pad, pad, pad);
-        TextView hint = new TextView(this);
+        hint = new TextView(this);
         hint.setGravity(Gravity.CENTER);
-        hint.setText("◀ ▶ ▲ ▼ chọn phím · OK để gõ · Telex: s sắc · f huyền · r hỏi · x ngã · j nặng · "
-                + "aa â · aw ă · ow ơ · w ư · dd đ · Back để đóng");
+        hint.setText(HINT);
         hint.setTextColor(0x99FFFFFF);
         hint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
         column.addView(hint);
@@ -132,6 +135,9 @@ public class KeyboardService extends InputMethodService {
             case KeyboardView.DONE:
                 done(ic);
                 break;
+            case KeyboardView.MIC:
+                toggleDictation();
+                break;
             default:
                 break;
         }
@@ -175,17 +181,73 @@ public class KeyboardService extends InputMethodService {
         requestHideSelf(0);
     }
 
-    // The remote's D-pad and OK go to the keyboard while it is on screen; everything else (Back, numbers) to the app.
+    // ------------------------------------------------------------------ voice typing
+
+    private void toggleDictation() {
+        if (dictation != null && dictation.isListening()) {
+            dictation.stop();
+            return;
+        }
+        if (dictation == null) dictation = new Dictation(this, new Dictation.Callback() {
+            @Override
+            public void onState(boolean listening, String status) {
+                if (keyboard != null) keyboard.setListening(listening);
+                if (hint != null) hint.setText(status == null ? HINT : status);
+            }
+
+            @Override
+            public void onText(String text) {
+                InputConnection ic = getCurrentInputConnection();
+                if (ic == null || text.isEmpty()) return;
+                CharSequence before = ic.getTextBeforeCursor(1, 0);
+                boolean space = before != null && before.length() > 0 && !Character.isWhitespace(before.charAt(0));
+                ic.commitText((space ? " " : "") + text, 1);
+                updateShift();
+            }
+
+            @Override
+            public void onNeedPermission() {
+                startActivity(new android.content.Intent(KeyboardService.this, MicPermissionActivity.class)
+                        .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK));
+            }
+        });
+        dictation.start(keyboard == null || keyboard.isVietnamese() ? "vi-VN" : "en-US");
+    }
+
+    @Override
+    public void onFinishInputView(boolean finishingInput) {
+        super.onFinishInputView(finishingInput);
+        if (dictation != null) dictation.cancel();
+    }
+
+    @Override
+    public void onDestroy() {
+        if (dictation != null) dictation.destroy();
+        super.onDestroy();
+    }
+
+    // The remote's D-pad and OK go to the keyboard while it is on screen; the remote's voice/search key starts
+    // dictation; everything else (Back, numbers) goes to the app.
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if (isInputViewShown() && keyboard != null && keyboard.handleKey(keyCode)) return true;
+        if (isInputViewShown() && keyboard != null) {
+            if (isVoiceKey(keyCode)) {
+                if (event.getRepeatCount() == 0) toggleDictation();
+                return true;
+            }
+            if (keyboard.handleKey(keyCode)) return true;
+        }
         return super.onKeyDown(keyCode, event);
     }
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event) {
-        if (isInputViewShown() && keyboard != null && isKeyboardKey(keyCode)) return true;
+        if (isInputViewShown() && keyboard != null && (isKeyboardKey(keyCode) || isVoiceKey(keyCode))) return true;
         return super.onKeyUp(keyCode, event);
+    }
+
+    private static boolean isVoiceKey(int keyCode) {
+        return keyCode == KeyEvent.KEYCODE_SEARCH || keyCode == KeyEvent.KEYCODE_VOICE_ASSIST;
     }
 
     private static boolean isKeyboardKey(int keyCode) {
