@@ -113,14 +113,19 @@ nút Giải phóng RAM thường báo "RAM đã gọn".
 - Phím **VI / ABC** tắt Telex; ô mật khẩu, email, link tự chuyển sang ABC. Tự viết hoa chữ đầu ở ô tên/câu.
 - Phím **?123** chuyển sang bảng ký tự đặc biệt (`@ # $ % & * - + = / ( ) [ ] { } ! ? : ; ' " _ ~ ^ < > |`),
   bấm **ABC** để quay lại bảng chữ.
+- **Gõ bằng giọng nói** (mới ở 1.8.2): phím **Nói** (hoặc nút micro/tìm kiếm trên remote khi bàn phím đang mở) nghe
+  qua micro trên remote, hiện chữ dần trên dòng gợi ý rồi chèn vào ô đang nhập; chế độ VI nhận tiếng Việt, ABC nhận
+  tiếng Anh. Dùng dịch vụ giọng nói có sẵn của TV (Google) nên cần mạng; lần đầu hỏi quyền micro (`install.ps1` cấp sẵn).
+- Phím đang chọn chỉ đổi nền sang màu kem, giữ nguyên bo góc và viền như các phím khác.
 - Bàn phím chỉ chiếm nửa dưới màn hình, ô đang nhập vẫn nhìn thấy.
 
 ### Nhẹ và an toàn
 - APK ~120 KB, chỉ dùng Android framework (không AndroidX, không thư viện ngoài); icon và nền vẽ bằng code; ảnh nền
   được thu nhỏ và làm mờ một lần rồi lưu đệm. Hợp với TV box RAM 1 GB.
 - Quyền: `INTERNET` (chỉ để lấy thời tiết), `SYSTEM_ALERT_WINDOW` + foreground service (khoá trẻ em), đọc ảnh (ảnh nền,
-  trình chiếu), `WRITE_SETTINGS` / `WRITE_SECURE_SETTINGS` (màn hình chờ, cấp qua ADB). Không quảng cáo, không thu
-  thập dữ liệu.
+  trình chiếu), `WRITE_SETTINGS` / `WRITE_SECURE_SETTINGS` (màn hình chờ, cấp qua ADB), `RECORD_AUDIO` (chỉ khi bấm
+  Nói trên bàn phím), `KILL_BACKGROUND_PROCESSES` (Dọn dẹp). Không quảng cáo, không thu thập dữ liệu. Xem
+  [CHANGELOG.md](CHANGELOG.md) cho lịch sử phiên bản.
 - Bố cục thiết kế trên sân khấu 960×540dp và phóng đều theo màn hình (720p, 1080p, 4K đều giống nhau).
 
 ---
@@ -141,7 +146,7 @@ tivihome/          <- repo này
    mạng** nếu có) trong Tuỳ chọn nhà phát triển.
 2. **Build** (chạy test âm lịch trước khi build):
    ```powershell
-   powershell -ExecutionPolicy Bypass -File build.ps1 -VersionCode 19 -VersionName 1.8.1
+   powershell -ExecutionPolicy Bypass -File build.ps1 -VersionCode 21 -VersionName 1.8.3
    ```
    Bộ công cụ ở chỗ khác thì thêm `-BuildTools D:\duong\dan\buildtools`. Lần đầu tạo khoá ký `debug.keystore` —
    **giữ file này** (đã nằm trong `.gitignore`): mất khoá thì bản sau không cài đè được.
