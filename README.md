@@ -133,7 +133,7 @@ nút Giải phóng RAM thường báo "RAM đã gọn".
 ---
 ## Cài nhanh: một file `.bat` trên Windows
 
-Tải [`Cai-Tivi-Home.bat`](Cai-Tivi-Home.bat), bỏ vào **một thư mục bất kỳ** (Desktop, Downloads, `D:\Tivi`, USB… —
+Tải [`Cai-Tivi-Home.bat`](https://github.com/tuanpa-1702/restore-your-tivi/releases), bỏ vào **một thư mục bất kỳ** (Desktop, Downloads, `D:\Tivi`, USB… —
 tên có dấu cách hay tiếng Việt đều được), rồi nháy đúp.
 
 | Bước | Việc xảy ra |
