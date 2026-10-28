@@ -131,7 +131,7 @@ nút Giải phóng RAM thường báo "RAM đã gọn".
 - Bố cục thiết kế trên sân khấu 960×540dp và phóng đều theo màn hình (720p, 1080p, 4K đều giống nhau).
 
 ---
-## Cài nhanh: một file `.bat` trên Windows
+## Cách 1: Cài nhanh: một file `.bat` trên Windows
 
 Tải [`Cai-Tivi-Home.bat`](https://github.com/tuanpa-1702/restore-your-tivi/releases), bỏ vào **một thư mục bất kỳ** (Desktop, Downloads, `D:\Tivi`, USB… —
 tên có dấu cách hay tiếng Việt đều được), rồi nháy đúp.
@@ -186,7 +186,7 @@ Bản chạy CRLF được tạo trong `%LOCALAPPDATA%\TiviHome\` — không là
 
 ---
 
-## Cài lên TV (thủ công bằng ADB shell):
+## Cách 2: Cài lên TV (thủ công bằng ADB shell):
 
 **Yêu cầu:** Android TV / TV box **Android 8.0 trở lên**, máy tính Windows cùng mạng, JDK 17 và Android SDK
 (platform `android-34`, build-tools `34.0.0`, platform-tools). Không cần Android Studio hay Gradle.
@@ -230,7 +230,7 @@ Home; với launcher khác dùng `pm enable <gói>` + `set-home-activity`. Gỡ 
 
 ---
 
-## Cài bằng cách promt cho AI (Claude Code, ChatGPT Codex, Gemini CLI…)
+## Cách 3: Cài bằng cách promt cho AI (Claude Code, ChatGPT Codex, Gemini CLI…)
 
 Dán link repo này vào AI kèm yêu cầu. AI có thể đọc [`AGENTS.md`](AGENTS.md) để biết đọc gì và theo quy tắc nào;
 design system nằm trong [`design/`](design/). Copy nguyên câu lệnh dưới đây (đã có sẵn link repo), chỉ thay phần trong `<...>`:
