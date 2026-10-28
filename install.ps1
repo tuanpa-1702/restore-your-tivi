@@ -31,6 +31,8 @@ if ($LASTEXITCODE -ne 0) { throw 'pm install failed' }
 & $adb -s $serial shell pm grant com.tivibox.home android.permission.READ_MEDIA_IMAGES
 & $adb -s $serial shell appops set com.tivibox.home WRITE_SETTINGS allow
 & $adb -s $serial shell pm grant com.tivibox.home android.permission.WRITE_SECURE_SETTINGS
+# Voice typing on Bàn phím Tivi (the keyboard otherwise asks on first use of the Nói key).
+& $adb -s $serial shell pm grant com.tivibox.home android.permission.RECORD_AUDIO
 & $adb -s $serial shell appops write-settings
 & $adb -s $serial shell am start -n com.tivibox.home/.MainActivity
 Write-Host 'Installed and opened Tivi Home. The stock launcher is unchanged; press Home to go back to it.'
