@@ -108,7 +108,7 @@ public class ImagePickerActivity extends Activity {
         setContentView(root);
 
         if (hasPermission()) scan();
-        else requestPermissions(new String[]{permission()}, REQ_PERMISSION);
+        else Compat.request(this, permission(), REQ_PERMISSION);
     }
 
     @Override
@@ -122,7 +122,7 @@ public class ImagePickerActivity extends Activity {
     }
 
     private boolean hasPermission() {
-        return checkSelfPermission(permission()) == PackageManager.PERMISSION_GRANTED;
+        return Compat.has(this, permission());
     }
 
     @Override

@@ -67,7 +67,7 @@ final class AppCatalog {
     static List<App> alphabetical(Map<String, App> apps) {
         List<App> list = new ArrayList<>(apps.values());
         Collator collator = Collator.getInstance(new Locale("vi"));
-        list.sort((a, b) -> collator.compare(a.label, b.label));
+        java.util.Collections.sort(list, (a, b) -> collator.compare(a.label, b.label));
         return list;
     }
 

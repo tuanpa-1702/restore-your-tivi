@@ -32,7 +32,7 @@ final class ChildLock {
     }
 
     static boolean canCoverApps(Context c) {
-        return Settings.canDrawOverlays(c);
+        return Compat.canDrawOverlays(c);
     }
 
     static void start(Context c, int minutes) {

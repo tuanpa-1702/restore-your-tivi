@@ -10,7 +10,7 @@ import java.util.Map;
 
 /** Dialogs that change which apps sit on the dock. */
 final class DockEditor {
-    static final int DIALOG_THEME = android.R.style.Theme_DeviceDefault_Dialog_Alert;
+    static final int DIALOG_THEME = Compat.dialogTheme();
 
     private DockEditor() {}
 

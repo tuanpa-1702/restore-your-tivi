@@ -82,6 +82,12 @@
             android:screenOrientation="landscape" />
 
         <activity
+            android:name=".PlayerActivity"
+            android:configChanges="keyboard|keyboardHidden|navigation|orientation|screenLayout|screenSize"
+            android:exported="false"
+            android:screenOrientation="landscape" />
+
+        <activity
             android:name=".MicPermissionActivity"
             android:exported="false"
             android:excludeFromRecents="true"

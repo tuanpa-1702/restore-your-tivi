@@ -30,7 +30,8 @@ public class LockService extends Service {
     private Prefs prefs;
     private WindowManager windows;
     private AudioManager audio;
-    private AudioFocusRequest focus;
+    private Object focus; // AudioFocusRequest on Android 8+, the legacy listener before
+
     private LockScreenView overlay;
     private boolean warned, muted;
 
@@ -47,7 +48,8 @@ public class LockService extends Service {
         Intent i = new Intent(c, LockService.class);
         if (ChildLock.active(new Prefs(c))) {
             try {
-                c.startForegroundService(i);
+                if (Compat.atLeast(26)) c.startForegroundService(i);
+                else c.startService(i);
             } catch (IllegalStateException | SecurityException e) {
                 // Not allowed from the background; MainActivity starts it again on its next resume.
             }
@@ -60,15 +62,20 @@ public class LockService extends Service {
     public void onCreate() {
         super.onCreate();
         prefs = new Prefs(this);
-        windows = getSystemService(WindowManager.class);
-        audio = getSystemService(AudioManager.class);
-        NotificationManager nm = getSystemService(NotificationManager.class);
-        nm.createNotificationChannel(new NotificationChannel(CHANNEL, "Khoá trẻ em", NotificationManager.IMPORTANCE_MIN));
+        windows = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        audio = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        if (Compat.atLeast(26)) {
+            NotificationManager nm = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.createNotificationChannel(new NotificationChannel(CHANNEL, "Khoá trẻ em", NotificationManager.IMPORTANCE_MIN));
+        }
     }
 
     @Override
+    @SuppressWarnings("deprecation")
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Notification n = new Notification.Builder(this, CHANNEL)
+        Notification.Builder builder = Compat.atLeast(26) ? new Notification.Builder(this, CHANNEL)
+                : new Notification.Builder(this).setPriority(Notification.PRIORITY_MIN);
+        Notification n = builder
                 .setSmallIcon(R.drawable.ic_launcher)
                 .setContentTitle("Khoá trẻ em đang bật")
                 .setOngoing(true)
@@ -105,7 +112,7 @@ public class LockService extends Service {
         overlay = new LockScreenView(this, prefs.theme(), this::tryUnlock);
         WindowManager.LayoutParams lp = new WindowManager.LayoutParams(
                 WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT,
-                WindowManager.LayoutParams.TYPE_APPLICATION_OVERLAY,
+                Compat.overlayWindowType(),
                 WindowManager.LayoutParams.FLAG_LAYOUT_IN_SCREEN | WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 PixelFormat.OPAQUE);
         try {
@@ -129,10 +136,14 @@ public class LockService extends Service {
         long now = SystemClock.uptimeMillis();
         audio.dispatchMediaKeyEvent(new KeyEvent(now, now, KeyEvent.ACTION_DOWN, KeyEvent.KEYCODE_MEDIA_PAUSE, 0));
         audio.dispatchMediaKeyEvent(new KeyEvent(now, now, KeyEvent.ACTION_UP, KeyEvent.KEYCODE_MEDIA_PAUSE, 0));
-        focus = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
-                .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build())
-                .build();
-        audio.requestAudioFocus(focus);
+        if (Compat.atLeast(26)) {
+            focus = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(new AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build())
+                    .build();
+            audio.requestAudioFocus((AudioFocusRequest) focus);
+        } else {
+            requestLegacyFocus();
+        }
         try {
             audio.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_MUTE, 0);
             muted = true;
@@ -141,9 +152,20 @@ public class LockService extends Service {
         }
     }
 
+    // Android 5–7: the pre-AudioFocusRequest calls.
+    private final AudioManager.OnAudioFocusChangeListener legacyFocus = change -> { };
+
+    @SuppressWarnings("deprecation")
+    private void requestLegacyFocus() {
+        audio.requestAudioFocus(legacyFocus, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        focus = legacyFocus;
+    }
+
+    @SuppressWarnings("deprecation")
     private void restoreAudio() {
         if (focus != null) {
-            audio.abandonAudioFocusRequest(focus);
+            if (Compat.atLeast(26)) audio.abandonAudioFocusRequest((AudioFocusRequest) focus);
+            else audio.abandonAudioFocus(legacyFocus);
             focus = null;
         }
         if (muted) {

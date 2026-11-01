@@ -11,14 +11,18 @@ import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.util.function.Predicate;
 
 /** Full-screen "time is up" screen with the PIN pad. Swallows Back so it can only be left with the PIN. */
 public class LockScreenView extends FrameLayout {
     private final PinPadView pad;
     private final TextView error;
 
-    public LockScreenView(Context context, int theme, Predicate<String> unlock) {
+    /** java.util.function.Predicate is Android 7+; this is the same shape for Android 5. */
+    interface Unlock {
+        boolean test(String pin);
+    }
+
+    public LockScreenView(Context context, int theme, Unlock unlock) {
         super(context);
         float dp = context.getResources().getDisplayMetrics().density;
         MeshBackgroundView bg = new MeshBackgroundView(context, null);

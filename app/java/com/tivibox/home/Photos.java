@@ -86,7 +86,7 @@ final class Photos {
 
     static List<Volume> volumes(Context c) {
         List<Volume> out = new ArrayList<>();
-        android.os.storage.StorageManager sm = c.getSystemService(android.os.storage.StorageManager.class);
+        android.os.storage.StorageManager sm = (android.os.storage.StorageManager) c.getSystemService(Context.STORAGE_SERVICE);
         if (Build.VERSION.SDK_INT >= 30 && sm != null) {
             for (android.os.storage.StorageVolume v : sm.getStorageVolumes()) {
                 File dir = v.getDirectory();
@@ -127,7 +127,7 @@ final class Photos {
         List<File> out = new ArrayList<>();
         java.util.Set<String> seen = new java.util.HashSet<>();
         for (Volume v : volumes(c)) walk(v.dir, 0, out, seen);
-        out.sort((a, b) -> Long.compare(b.lastModified(), a.lastModified()));
+        java.util.Collections.sort(out, (a, b) -> Long.compare(b.lastModified(), a.lastModified()));
         return out;
     }
 
@@ -258,6 +258,35 @@ final class Photos {
     static void saveSlides(Context c, List<Uri> picked) throws IOException {
         for (File f : slides(c)) f.delete();
         for (int i = 0; i < picked.size(); i++) save(c, picked.get(i), new File(slidesDir(c), String.format("%02d.jpg", i)));
+    }
+
+    /**
+     * The demo photo (mountains at sunset) ships inside the APK. It becomes the wallpaper on first run, and
+     * "Dùng ảnh mẫu" puts it back later.
+     */
+    static void useDemoWallpaper(Context c) {
+        File dest = wallpaperFile(c);
+        File tmp = new File(dest.getPath() + ".tmp");
+        try (java.io.InputStream in = c.getResources().openRawResource(R.drawable.demo_wallpaper);
+             FileOutputStream out = new FileOutputStream(tmp)) {
+            byte[] buf = new byte[16384];
+            for (int n; (n = in.read(buf)) > 0; ) out.write(buf, 0, n);
+        } catch (IOException e) {
+            tmp.delete();
+            return;
+        }
+        if (tmp.renameTo(dest)) {
+            wallpaperCache = null;
+            wallpaperKey = "";
+        }
+    }
+
+    /** First launch only: start with the demo wallpaper instead of a plain gradient. */
+    static void ensureFirstWallpaper(Context c) {
+        android.content.SharedPreferences sp = c.getSharedPreferences("home", Context.MODE_PRIVATE);
+        if (sp.getBoolean("demo_wallpaper_done", false)) return;
+        if (!wallpaperFile(c).exists()) useDemoWallpaper(c);
+        sp.edit().putBoolean("demo_wallpaper_done", true).apply();
     }
 
     static void removeWallpaper(Context c) {

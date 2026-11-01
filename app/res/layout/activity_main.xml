@@ -68,6 +68,13 @@
                     android:visibility="gone" />
 
                 <com.tivibox.home.RoundButton
+                    android:id="@+id/btn_input"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:layout_marginEnd="10dp"
+                    android:visibility="gone" />
+
+                <com.tivibox.home.RoundButton
                     android:id="@+id/btn_lock"
                     android:layout_width="32dp"
                     android:layout_height="32dp" />
@@ -136,7 +143,9 @@
             </LinearLayout>
         </FrameLayout>
 
+        <!-- 199dp tall; MainActivity makes it 184dp when the VTV row is shown. -->
         <LinearLayout
+            android:id="@+id/cards"
             android:layout_width="match_parent"
             android:layout_height="199dp"
             android:orientation="horizontal">
@@ -154,6 +163,16 @@
                 android:layout_marginStart="14dp"
                 android:layout_weight="1" />
         </LinearLayout>
+
+        <!-- VTV channel row (Cài đặt giao diện → Kênh VTV); chips are added by MainActivity. -->
+        <LinearLayout
+            android:id="@+id/channels"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="12dp"
+            android:clipChildren="false"
+            android:orientation="horizontal"
+            android:visibility="gone" />
 
         <!-- Dock tiles are added by MainActivity from the saved dock. -->
         <LinearLayout

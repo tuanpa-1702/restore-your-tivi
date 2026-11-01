@@ -134,7 +134,7 @@ public class ScreensaverSettingsActivity extends Activity {
     }
 
     private boolean canWriteSecure() {
-        return checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED;
+        return Compat.has(this, Manifest.permission.WRITE_SECURE_SETTINGS);
     }
 
     private void pickTimeout() {
@@ -156,7 +156,7 @@ public class ScreensaverSettingsActivity extends Activity {
             build();
             return;
         }
-        if (!Settings.System.canWrite(this)) {
+        if (!Compat.canWriteSettings(this)) {
             needPermission();
             return;
         }

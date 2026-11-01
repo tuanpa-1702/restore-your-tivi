@@ -18,8 +18,6 @@ import android.widget.TextView;
  * which rewrites the word before the cursor (s f r x j tones, aa/aw/dd…); password, e-mail and URL fields start in ABC.
  */
 public class KeyboardService extends InputMethodService {
-    private static final String HINT = "◀ ▶ ▲ ▼ chọn phím · OK để gõ · Nói: gõ bằng giọng nói · Telex: s sắc · f huyền · "
-            + "r hỏi · x ngã · j nặng · aa â · aw ă · ow ơ · w ư · dd đ · Back để đóng";
     private KeyboardView keyboard;
     private MeshBackgroundView background;
     private TextView hint;
@@ -48,9 +46,10 @@ public class KeyboardService extends InputMethodService {
         column.setGravity(Gravity.CENTER_HORIZONTAL);
         int pad = Math.round(12 * dp);
         column.setPadding(pad, pad, pad, pad);
+        // No key guide; this line only appears for voice typing status ("Đang nghe…", errors).
         hint = new TextView(this);
         hint.setGravity(Gravity.CENTER);
-        hint.setText(HINT);
+        hint.setVisibility(View.GONE);
         hint.setTextColor(0x99FFFFFF);
         hint.setTextSize(TypedValue.COMPLEX_UNIT_DIP, 11);
         column.addView(hint);
@@ -192,7 +191,10 @@ public class KeyboardService extends InputMethodService {
             @Override
             public void onState(boolean listening, String status) {
                 if (keyboard != null) keyboard.setListening(listening);
-                if (hint != null) hint.setText(status == null ? HINT : status);
+                if (hint != null) {
+                    hint.setVisibility(status == null ? View.GONE : View.VISIBLE);
+                    if (status != null) hint.setText(status);
+                }
             }
 
             @Override

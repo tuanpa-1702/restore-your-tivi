@@ -75,6 +75,7 @@ public class SettingsActivity extends Activity {
                         : "Chưa có quyền hiển thị trên ứng dụng khác — bấm để cấp",
                 () -> startActivity(new Intent(this, ChildLockActivity.class)));
         row("Ứng dụng trên dock", dockSummary(), () -> DockEditor.pick(this, prefs, this::buildRows));
+        row("Kênh VTV", channelSummary(), this::pickChannels);
         row("Sắp xếp", "Giữ OK trên một ô để di chuyển · bấm để đặt lại thứ tự", this::resetOrder);
         row("Dọn dẹp", Cleanup.summary(this), this::cleanupMenu);
         row("Cài đặt Android", "Wi-Fi, âm thanh, hiển thị, ứng dụng…", this::openAndroidSettings);
@@ -87,12 +88,16 @@ public class SettingsActivity extends Activity {
         boolean has = Photos.wallpaperFile(this).exists();
         String[] items = has
                 ? new String[]{"Chọn ảnh khác", "Độ mờ: " + BLUR_NAMES[prefs.wallpaperBlur()],
-                "Cách hiển thị: " + (prefs.wallpaperFit() ? FIT_NAMES[1] : FIT_NAMES[0]), "Bỏ ảnh nền (dùng màu nền)"}
-                : new String[]{"Chọn ảnh"};
+                "Cách hiển thị: " + (prefs.wallpaperFit() ? FIT_NAMES[1] : FIT_NAMES[0]), "Bỏ ảnh nền (dùng màu nền)",
+                "Dùng ảnh mẫu Tivi Home"}
+                : new String[]{"Chọn ảnh", "Dùng ảnh mẫu Tivi Home"};
         new AlertDialog.Builder(this, DockEditor.DIALOG_THEME)
                 .setTitle("Ảnh nền màn hình chính")
                 .setItems(items, (d, which) -> {
-                    if (which == 0) {
+                    if (which == items.length - 1) {
+                        Photos.useDemoWallpaper(this);
+                        buildRows();
+                    } else if (which == 0) {
                         startActivity(ImagePickerActivity.open(this, ImagePickerActivity.MODE_WALLPAPER));
                     } else if (which == 1) {
                         new AlertDialog.Builder(this, DockEditor.DIALOG_THEME)
@@ -131,7 +136,41 @@ public class SettingsActivity extends Activity {
         Map<String, AppCatalog.App> apps = AppCatalog.load(this);
         List<String> labels = new ArrayList<>();
         for (String e : AppCatalog.dock(prefs, apps)) labels.add(AppCatalog.label(e, apps));
-        return String.join(" · ", labels);
+        return Compat.join(" · ", labels);
+    }
+
+    private String channelSummary() {
+        List<Channels.Channel> shown = Channels.shown(prefs);
+        if (shown.isEmpty()) return "Đang ẩn — bấm để chọn kênh hiện trên màn hình chính";
+        List<String> names = new ArrayList<>();
+        for (Channels.Channel c : shown) names.add(c.name);
+        return shown.size() + " kênh trên màn hình chính · " + Compat.join(", ", names);
+    }
+
+    /** Ticks the VTV channels for the Home row; none ticked hides the row. */
+    private void pickChannels() {
+        String[] names = new String[Channels.ALL.length];
+        boolean[] on = new boolean[names.length];
+        List<String> ids = prefs.channels();
+        for (int i = 0; i < names.length; i++) {
+            names[i] = Channels.ALL[i].name;
+            on[i] = ids.contains(Channels.ALL[i].id);
+        }
+        new AlertDialog.Builder(this, DockEditor.DIALOG_THEME)
+                .setTitle("Kênh VTV trên màn hình chính")
+                .setMultiChoiceItems(names, on, (d, which, checked) -> on[which] = checked)
+                .setPositiveButton("Lưu", (d, w) -> {
+                    List<String> picked = new ArrayList<>();
+                    for (int i = 0; i < on.length; i++) if (on[i]) picked.add(Channels.ALL[i].id);
+                    prefs.setChannels(picked);
+                    buildRows();
+                })
+                .setNeutralButton("Ẩn hàng kênh", (d, w) -> {
+                    prefs.setChannels(new ArrayList<>());
+                    buildRows();
+                })
+                .setNegativeButton("Huỷ", null)
+                .show();
     }
 
     private String versionName() {

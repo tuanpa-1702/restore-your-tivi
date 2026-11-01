@@ -83,7 +83,7 @@ public class KeyboardView extends View {
         List<Key> r = new ArrayList<>();
         r.add(new Key(SYMBOLS, "", pageLabel, 1.5f));
         r.add(new Key(MODE, "", "VI", 1));
-        r.add(new Key(MIC, "", "Nói", 1));
+        r.add(new Key(MIC, "", "", 1)); // drawn as a microphone icon
         r.addAll(chars(",."));
         r.add(new Key(SPACE, " ", "dấu cách", 3));
         r.add(new Key(DONE, "", "Xong", 1.5f));
@@ -215,6 +215,11 @@ public class KeyboardView extends View {
                         : (k.type == SHIFT && shift) || (k.type == MIC && listening) ? 0xFFFFC857 : 0x21FFFFFF;
                 Glass.panel(c, paint, rect, 0, 0, b.width(), b.height(), 10 * dp, dp, fill, 0x3DFFFFFF);
                 c.restore();
+                if (k.type == MIC) {
+                    int color = at || listening ? 0xFF15151C : 0xFFFFFFFF;
+                    Glyphs.draw(c, Glyphs.MIC, b.centerX(), b.centerY(), 26 * dp, color);
+                    continue;
+                }
                 String label = k.type == MODE ? (vietnamese ? "VI" : "ABC")
                         : k.label != null ? k.label : shift ? k.text.toUpperCase() : k.text;
                 boolean word = label.length() > 1;

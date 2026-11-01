@@ -105,60 +105,44 @@ public class WeatherCardView extends View {
         String sub = place + " · cập nhật " + updatedText(data.fetchedAt) + (offline ? " · mất kết nối" : "");
         canvas.drawText(ellipsize(sub, w - 2 * pad), pad, pad + badge + 15 * dp, paint);
 
+        // Current conditions, centred in the card: details on the left, a large temperature on the right.
+        float dy = Math.max(0, (h - 158 * dp) / 2);
         String todayIso = isoDate(Calendar.getInstance());
         Weather.Day today = data.dayFor(todayIso);
 
         paint.setTextAlign(Paint.Align.RIGHT);
         paint.setTypeface(light);
-        paint.setTextSize(54 * dp);
         paint.setColor(0xFFFFFFFF);
         String temp = Math.round(data.temp) + "°";
-        canvas.drawText(temp, w - pad + 2 * dp, 128 * dp, paint);
+        float base = 155 * dp + dy; // baseline on the last detail line
+        paint.setTextSize(100 * dp);
+        canvas.drawText(temp, w - pad + 2 * dp, base, paint);
         float textMax = w - 2 * pad - paint.measureText(temp) - 12 * dp;
 
         paint.setTextAlign(Paint.Align.LEFT);
         paint.setTypeface(medium);
         paint.setTextSize(16 * dp);
-        canvas.drawText(ellipsize(Weather.describe(data.code), textMax), pad, 92 * dp, paint);
+        canvas.drawText(ellipsize(Weather.describe(data.code), textMax), pad, 92 * dp + dy, paint);
         paint.setTypeface(regular);
         paint.setTextSize(10 * dp);
         paint.setColor(0xB3FFFFFF);
         StringBuilder line2 = new StringBuilder("Cảm giác ").append(Math.round(data.feels)).append("°");
         if (data.humidity >= 0) line2.append(" · Độ ẩm ").append(data.humidity).append("%");
-        canvas.drawText(ellipsize(line2.toString(), textMax), pad, 110 * dp, paint);
+        canvas.drawText(ellipsize(line2.toString(), textMax), pad, 110 * dp + dy, paint);
         if (today != null) {
             StringBuilder line3 = new StringBuilder("Cao ").append(deg(today.max)).append(" · Thấp ").append(deg(today.min));
             if (today.rain >= 0) line3.append(" · Mưa ").append(today.rain).append("%");
-            canvas.drawText(ellipsize(line3.toString(), textMax), pad, 125 * dp, paint);
-        }
-
-        float lineY = 140 * dp;
-        paint.setColor(0x24FFFFFF);
-        paint.setStrokeWidth(dp);
-        canvas.drawLine(pad, lineY, w - pad, lineY, paint);
-
-        List<Weather.Day> days = data.days;
-        int start = 0;
-        while (start < days.size() && days.get(start).date.compareTo(todayIso) < 0) start++;
-        float colW = (w - 2 * pad) / 4f;
-        for (int i = 0; i < 4 && start + i < days.size(); i++) {
-            Weather.Day d = days.get(start + i);
-            float x = pad + i * colW;
-            paint.setTypeface(medium);
-            paint.setTextSize(9 * dp);
-            paint.setColor(0xA6FFFFFF);
-            canvas.drawText(dayLabel(d.date, todayIso), x, lineY + 18 * dp, paint);
-            Glyphs.draw(canvas, Weather.glyph(d.code, true), x + 9 * dp, lineY + 34 * dp, 20 * dp, 0xFFFFFFFF);
-            paint.setTypeface(regular);
-            paint.setTextSize(10.5f * dp);
-            paint.setColor(0xFFFFFFFF);
-            String hi = deg(d.max);
-            canvas.drawText(hi, x + 23 * dp, lineY + 38 * dp, paint);
-            paint.setColor(0x8CFFFFFF);
-            canvas.drawText(" " + deg(d.min), x + 23 * dp + paint.measureText(hi), lineY + 38 * dp, paint);
+            canvas.drawText(ellipsize(line3.toString(), textMax), pad, 125 * dp + dy, paint);
+            StringBuilder line4 = new StringBuilder();
+            if (!Double.isNaN(data.wind)) line4.append("Gió ").append(Math.round(data.wind)).append(" km/h");
+            if (!Double.isNaN(today.uv)) line4.append(line4.length() > 0 ? " · " : "").append("UV ").append(Math.round(today.uv));
+            if (line4.length() > 0) canvas.drawText(ellipsize(line4.toString(), textMax), pad, 140 * dp + dy, paint);
+            if (!today.sunrise.isEmpty() && !today.sunset.isEmpty()) {
+                canvas.drawText(ellipsize("Mặt trời mọc " + today.sunrise + " · lặn " + today.sunset, textMax),
+                        pad, 155 * dp + dy, paint);
+            }
         }
     }
-
     private void drawMessage(Canvas canvas, float w, float h) {
         float pad = 16 * dp;
         paint.setTextAlign(Paint.Align.CENTER);
@@ -171,8 +155,7 @@ public class WeatherCardView extends View {
         textPaint.setTextSize(10.5f * dp);
         textPaint.setColor(0xB3FFFFFF);
         int width = (int) Math.max(1, w - 4 * pad);
-        StaticLayout layout = StaticLayout.Builder.obtain(detail, 0, detail.length(), textPaint, width)
-                .setAlignment(Layout.Alignment.ALIGN_CENTER).setMaxLines(3).build();
+        StaticLayout layout = textLayout(detail, width);
         canvas.save();
         canvas.translate(2 * pad, h * .5f + 12 * dp);
         layout.draw(canvas);
@@ -213,5 +196,15 @@ public class WeatherCardView extends View {
         } catch (RuntimeException e) {
             return iso;
         }
+    }
+
+    /** Centred text, at most 3 lines (StaticLayout.Builder is Android 6+). */
+    @SuppressWarnings("deprecation")
+    private StaticLayout textLayout(String text, int width) {
+        if (Compat.atLeast(23)) {
+            return StaticLayout.Builder.obtain(text, 0, text.length(), textPaint, width)
+                    .setAlignment(Layout.Alignment.ALIGN_CENTER).setMaxLines(3).build();
+        }
+        return new StaticLayout(text, textPaint, width, Layout.Alignment.ALIGN_CENTER, 1f, 0f, false);
     }
 }

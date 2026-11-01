@@ -40,8 +40,8 @@ final class Dictation {
     }
 
     void start(String language) {
-        if (context.checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
-            callback.onState(false, "Cần cho phép dùng micro: chọn \"Cho phép\" trên màn hình vừa mở rồi bấm Nói lại");
+        if (!Compat.has(context, Manifest.permission.RECORD_AUDIO)) {
+            callback.onState(false, "Cần cho phép dùng micro: chọn \"Cho phép\" trên màn hình vừa mở rồi bấm phím micro lại");
             callback.onNeedPermission();
             return;
         }
@@ -93,7 +93,7 @@ final class Dictation {
     private final RecognitionListener listener = new RecognitionListener() {
         @Override
         public void onReadyForSpeech(Bundle params) {
-            callback.onState(true, "Đang nghe… nói vào micro trên remote · bấm Nói lần nữa để dừng");
+            callback.onState(true, "Đang nghe… nói vào micro trên remote · bấm phím micro lần nữa để dừng");
         }
 
         @Override
@@ -122,7 +122,7 @@ final class Dictation {
         @Override
         public void onResults(Bundle results) {
             String text = first(results);
-            finish(text.isEmpty() ? "Không nghe rõ, bấm Nói để thử lại" : null);
+            finish(text.isEmpty() ? "Không nghe rõ, bấm phím micro để thử lại" : null);
             if (!text.isEmpty()) callback.onText(text);
         }
 
@@ -140,7 +140,7 @@ final class Dictation {
         switch (error) {
             case SpeechRecognizer.ERROR_NO_MATCH:
             case SpeechRecognizer.ERROR_SPEECH_TIMEOUT:
-                return "Không nghe rõ, bấm Nói để thử lại";
+                return "Không nghe rõ, bấm phím micro để thử lại";
             case SpeechRecognizer.ERROR_AUDIO:
                 return "Không mở được micro (remote có micro và đang kết nối Bluetooth không?)";
             case SpeechRecognizer.ERROR_NETWORK:

@@ -130,6 +130,15 @@ final class Prefs {
         sp.edit().putBoolean("saver_clock", on).apply();
     }
 
+    /** VTV channel row on Home (Channels ids); empty hides the row. */
+    List<String> channels() {
+        return split(sp.getString("channels", Channels.DEFAULT));
+    }
+
+    void setChannels(List<String> ids) {
+        sp.edit().putString("channels", TextUtils.join(",", ids)).apply();
+    }
+
     boolean hasPlace() {
         return sp.contains("lat") && sp.contains("lon");
     }

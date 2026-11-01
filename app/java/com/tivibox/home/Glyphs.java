@@ -8,7 +8,7 @@ import android.graphics.RectF;
 /** Small canvas-drawn icons, so the launcher ships no bitmaps. UI thread only (shared Paint). */
 final class Glyphs {
     static final int YOUTUBE = 1, STORE = 2, GEAR = 3, GRID = 4, PALETTE = 5, WIFI = 6, LOCK = 7,
-            FOLDER = 8, PHOTOS = 9, DRIVE = 21, UP = 22;
+            FOLDER = 8, PHOTOS = 9, DRIVE = 21, UP = 22, INPUT = 23, MIC = 24;
     static final int SUN = 10, MOON = 11, SUN_CLOUD = 12, MOON_CLOUD = 13, CLOUD = 14,
             FOG = 15, DRIZZLE = 16, RAIN = 17, SNOW = 18, THUNDER = 19;
 
@@ -112,6 +112,23 @@ final class Glyphs {
                 c.drawLine(cx, cy + .28f * s, cx, cy - .26f * s, P);
                 c.drawLine(cx - .2f * s, cy - .06f * s, cx, cy - .26f * s, P);
                 c.drawLine(cx + .2f * s, cy - .06f * s, cx, cy - .26f * s, P);
+                break;
+            case INPUT:
+                // Screen with an arrow coming in from the left: "ngõ vào".
+                R.set(cx - .2f * s, cy - .28f * s, cx + .38f * s, cy + .2f * s);
+                c.drawRoundRect(R, .06f * s, .06f * s, P);
+                c.drawLine(cx - .02f * s, cy + .32f * s, cx + .2f * s, cy + .32f * s, P);
+                c.drawLine(cx - .4f * s, cy - .04f * s, cx + .1f * s, cy - .04f * s, P);
+                c.drawLine(cx - .04f * s, cy - .16f * s, cx + .1f * s, cy - .04f * s, P);
+                c.drawLine(cx - .04f * s, cy + .08f * s, cx + .1f * s, cy - .04f * s, P);
+                break;
+            case MIC:
+                R.set(cx - .12f * s, cy - .38f * s, cx + .12f * s, cy + .1f * s);
+                c.drawRoundRect(R, .12f * s, .12f * s, P);
+                R.set(cx - .24f * s, cy - .2f * s, cx + .24f * s, cy + .22f * s);
+                c.drawArc(R, 0, 180, false, P);
+                c.drawLine(cx, cy + .22f * s, cx, cy + .36f * s, P);
+                c.drawLine(cx - .12f * s, cy + .36f * s, cx + .12f * s, cy + .36f * s, P);
                 break;
             case WIFI: {
                 float by = cy + .24f * s;

@@ -38,8 +38,8 @@ public class MainActivity extends Activity {
     private Prefs prefs;
     private MeshBackgroundView background;
     private View stage;
-    private LinearLayout dockRow;
-    private RoundButton lock, wifi;
+    private LinearLayout dockRow, channelRow;
+    private RoundButton input, lock, wifi;
     private TextView greeting, weekday, date, lunar, lockStatus;
     private CalendarCardView calendar;
     private WeatherCardView weather;
@@ -72,9 +72,11 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         prefs = new Prefs(this);
+        Photos.ensureFirstWallpaper(this);
         background = findViewById(R.id.background);
         stage = findViewById(R.id.stage);
         dockRow = findViewById(R.id.dock);
+        channelRow = findViewById(R.id.channels);
         greeting = findViewById(R.id.greeting);
         weekday = findViewById(R.id.weekday);
         date = findViewById(R.id.date);
@@ -95,6 +97,10 @@ public class MainActivity extends Activity {
         wifi = findViewById(R.id.btn_wifi);
         wifi.setup(Glyphs.WIFI, "Wi-Fi");
         wifi.setOnClickListener(v -> openSettings(Settings.ACTION_WIFI_SETTINGS));
+        input = findViewById(R.id.btn_input);
+        input.setup(Glyphs.INPUT, "Ngõ vào");
+        input.setOnClickListener(v -> TvInputs.pick(this));
+        input.setNextFocusDownId(R.id.calendar);
 
         findViewById(R.id.root).addOnLayoutChangeListener(
                 (v, l, t, r, b, ol, ot, or, ob) -> fitStage(v.getWidth(), v.getHeight()));
@@ -131,7 +137,9 @@ public class MainActivity extends Activity {
         String g = prefs.greeting().trim();
         greeting.setText(g.isEmpty() ? "Xin chào" : g);
         refreshDate();
+        input.setVisibility(TvInputs.list(this).isEmpty() ? View.GONE : View.VISIBLE);
         buildDock();
+        buildChannels();
         View remembered = focusedId != 0 ? findViewById(focusedId) : null;
         if (remembered != null) remembered.requestFocus();
         else focusTile(focusedTile);
@@ -151,7 +159,7 @@ public class MainActivity extends Activity {
         View focus = getCurrentFocus();
         int i = focus == null ? -1 : dockRow.indexOfChild(focus);
         if (i >= 0) focusedTile = i;
-        focusedId = focus == lock || focus == wifi || focus == calendar || focus == weather ? focus.getId() : 0;
+        focusedId = focus == input || focus == lock || focus == wifi || focus == calendar || focus == weather ? focus.getId() : 0;
     }
 
     @Override
@@ -172,6 +180,49 @@ public class MainActivity extends Activity {
         focusedId = 0;
         focusedTile = 0;
         focusTile(0);
+    }
+
+    // ------------------------------------------------------------------ VTV row
+
+    /** The VTV channel row between the cards and the dock; the cards get shorter while it is shown. */
+    private void buildChannels() {
+        List<Channels.Channel> shown = Channels.shown(prefs);
+        float dp = getResources().getDisplayMetrics().density;
+        channelRow.removeAllViews();
+        View cards = findViewById(R.id.cards);
+        cards.getLayoutParams().height = Math.round((shown.isEmpty() ? 199 : 184) * dp);
+        cards.requestLayout();
+        // With the row: cards 184, row 52, dock 60 (instead of 79) so the logos get room on the 540dp stage.
+        LinearLayout.LayoutParams dlp = (LinearLayout.LayoutParams) dockRow.getLayoutParams();
+        dlp.topMargin = Math.round((shown.isEmpty() ? 17 : 12) * dp);
+        dlp.height = Math.round((shown.isEmpty() ? 79 : 60) * dp);
+        dockRow.requestLayout();
+        channelRow.setVisibility(shown.isEmpty() ? View.GONE : View.VISIBLE);
+        if (shown.isEmpty()) return;
+        for (int i = 0; i < shown.size(); i++) {
+            Channels.Channel ch = shown.get(i);
+            ChannelChip chip = new ChannelChip(this);
+            chip.setId(View.generateViewId());
+            chip.setChannel(ch);
+            chip.setOnClickListener(v -> startActivity(PlayerActivity.open(this, ch.id)));
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f);
+            if (i > 0) lp.setMarginStart(Math.round(8 * dp));
+            channelRow.addView(chip, lp);
+        }
+        // ▲ ▼ between cards, channels and dock: each goes to the item below/above on the same side.
+        int n = shown.size(), half = (n + 1) / 2;
+        calendar.setNextFocusDownId(channelRow.getChildAt(0).getId());
+        weather.setNextFocusDownId(channelRow.getChildAt(Math.min(half, n - 1)).getId());
+        for (int i = 0; i < n; i++) {
+            View chip = channelRow.getChildAt(i);
+            chip.setNextFocusUpId(i < half ? R.id.calendar : R.id.weather);
+            int tile = Math.min(dock.size() - 1, i * dock.size() / n);
+            chip.setNextFocusDownId(dockRow.getChildAt(tile).getId());
+        }
+        for (int i = 0; i < dock.size(); i++) {
+            int chip = Math.min(n - 1, i * n / dock.size());
+            dockRow.getChildAt(i).setNextFocusUpId(channelRow.getChildAt(chip).getId());
+        }
     }
 
     // ------------------------------------------------------------------ dock
@@ -244,11 +295,13 @@ public class MainActivity extends Activity {
                     } else if (which == 1) {
                         if (DockEditor.toggle(this, prefs, entry)) {
                             buildDock();
+                            buildChannels();
                             focusTile(i);
                         }
                     } else {
                         DockEditor.pick(this, prefs, () -> {
                             buildDock();
+                            buildChannels();
                             focusTile(i);
                         });
                     }
