@@ -220,7 +220,7 @@ khiển TV bằng chuột (scrcpy) và dọn ứng dụng rác.
 **Giữ thư mục `keys\` cạnh exe**: lần sau bấm Cài đặt / Cập nhật là cập nhật đè, giữ nguyên cài đặt trong app. Mã
 nguồn bộ cài không nằm trong repo này.
 
-### Cài thủ công (cho người muốn tự build)
+### Cách 3: Cài thủ công (cho người muốn tự build)
 
 **Yêu cầu:** Android TV / TV box **Android 5.0 trở lên** (Android 5–7 cũng chạy; xem "Android 5–7" bên dưới), máy tính Windows cùng mạng, JDK 17 và Android SDK
 (platform `android-34`, build-tools `34.0.0`, platform-tools). Không cần Android Studio hay Gradle.
@@ -261,38 +261,6 @@ tivihome/          <- repo này
 **Khôi phục:** `restore-old-launcher.ps1 -Tv <ip>` bật lại launcher CleanYourTV (`com.gathin.tvhome`) và đặt nó làm
 Home; với launcher khác dùng `pm enable <gói>` + `set-home-activity`. Gỡ app: bật lại launcher cũ trước, rồi
 `adb uninstall com.tivibox.home`. `undo-debloat-group1.ps1` bật lại nhóm gói hệ thống đã tắt khi dọn rác.
-
----
-
-## Thiết kế thêm với AI (Claude, ChatGPT, Gemini…)
-
-Dán link repo này vào AI kèm yêu cầu. AI có thể đọc [`AGENTS.md`](AGENTS.md) để biết đọc gì và theo quy tắc nào;
-design system nằm trong [`design/`](design/). Copy nguyên câu lệnh dưới đây (đã có sẵn link repo), chỉ thay phần trong `<...>`:
-
-**Thiết kế màn hình mới cùng phong cách**
-```
-Đọc design system tại https://github.com/tuanpa-1702/restore-your-tivi (bắt đầu từ AGENTS.md, rồi design/DESIGN.md và design/tokens/tokens.json,
-xem mẫu trong design/reference/ và ảnh trong design/screenshots/).
-Thiết kế màn hình "<tên màn hình>" cho TV theo đúng design system đó: sân khấu 960x540, nền mesh "Tím hồng",
-thẻ kính, focus nền kem viền xanh, chữ Roboto, điều khiển bằng remote. Xuất ra một file HTML độc lập.
-```
-
-**Thêm widget vào màn hình chính**
-```
-Theo design system ở https://github.com/tuanpa-1702/restore-your-tivi, thiết kế thêm thẻ "<tên widget>" thay cho thẻ thời tiết trên màn hình chính
-(cùng kích thước, kiểu thẻ kính, tiêu đề 15dp, có huy hiệu icon). Dựa trên design/reference/home.html.
-```
-
-**Dựng lại bằng nền tảng khác**
-```
-Dùng design system ở https://github.com/tuanpa-1702/restore-your-tivi để dựng lại màn hình chính bằng <Jetpack Compose / Flutter / SwiftUI / Figma>.
-Giữ nguyên token màu, cỡ chữ, bo góc, kiểu focus và sân khấu 960x540 phóng đều theo màn hình.
-```
-
-**Nhờ AI cài lên TV**: dùng prompt đầy đủ ở mục [Cài lên TV → Cách 1](#cách-1-nhờ-ai).
-
-Thêm prompt và mẹo: [`design/PROMPT.md`](design/PROMPT.md). AI không mở được link repo thì dán link file thô
-`https://raw.githubusercontent.com/tuanpa-1702/restore-your-tivi/main/design/DESIGN.md`.
 
 ---
 
