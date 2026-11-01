@@ -1,4 +1,4 @@
-# Builds build\TiviHome.apk with a JDK 17 and Android SDK (platform 34, build-tools 34.0.0), no Gradle, offline.
+﻿# Builds build\TiviHome.apk with a JDK 17 and Android SDK (platform 34, build-tools 34.0.0), no Gradle, offline.
 # Expects <BuildTools>\jdk\<jdk folder> and <BuildTools>\android-sdk; default <BuildTools> is ..\buildtools.
 # Usage: powershell -ExecutionPolicy Bypass -File build.ps1 [-VersionCode 2] [-VersionName 1.1] [-BuildTools D:\tools]
 param(
@@ -39,14 +39,14 @@ Step 'Unit tests (lunar calendar, Vietnamese tones, Telex)' {
 Step 'aapt2 compile' { & "$bt\aapt2.exe" compile --dir "$root\app\res" -o "$out\res.zip" }
 Step 'aapt2 link' {
     & "$bt\aapt2.exe" link -I $androidJar --manifest "$root\app\AndroidManifest.xml" --java "$out\gen" `
-        --min-sdk-version 26 --target-sdk-version 34 --version-code $VersionCode --version-name $VersionName `
+        --min-sdk-version 21 --target-sdk-version 34 --version-code $VersionCode --version-name $VersionName `
         -o "$out\base.apk" "$out\res.zip"
 }
 
 $sources = @(Get-ChildItem "$root\app\java", "$out\gen" -Recurse -Filter *.java | ForEach-Object { $_.FullName })
 Step 'javac' { & javac -encoding UTF-8 -source 11 -target 11 -Xlint:-options -cp $androidJar -d "$out\classes" $sources }
 Step 'jar' { & jar cf "$out\classes.jar" -C "$out\classes" . }
-Step 'd8' { & "$bt\d8.bat" --release --min-api 26 --lib $androidJar --output "$out\dex" "$out\classes.jar" }
+Step 'd8' { & "$bt\d8.bat" --release --min-api 21 --lib $androidJar --output "$out\dex" "$out\classes.jar" }
 
 Write-Host '== package'
 Copy-Item "$out\base.apk" "$out\unaligned.apk"

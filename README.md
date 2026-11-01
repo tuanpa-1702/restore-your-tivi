@@ -5,8 +5,6 @@ Màn hình chính (launcher) cho **Android TV / TV box**, giao diện kính mờ
 cùng phong cách. Điều khiển hoàn toàn bằng remote,
 giao diện tiếng Việt. Kèm theo là **design system** đầy đủ để bạn — hoặc bất kỳ AI nào — thiết kế thêm màn hình cùng
 phong cách.
-Và từ bản này, cài lên TV chỉ cần **một file `.bat`** trên Windows: không Android Studio, không Gradle, không cài
-JDK/Android SDK trước.
 
 ![Màn hình chính](design/screenshots/01-home.png)
 
@@ -43,10 +41,17 @@ JDK/Android SDK trước.
   màu hồng, hôm nay tô xanh. Âm lịch tính ngay trên TV theo giờ Việt Nam (thuật toán Hồ Ngọc Đức), không cần mạng,
   đúng cả tháng nhuận.
 - **Thời tiết** (Open-Meteo, miễn phí, không cần API key): nhiệt độ, tình trạng trời, cảm giác như, độ ẩm, cao/thấp,
-  khả năng mưa, dự báo 4 ngày. Nhập **tên thành phố hoặc quận/huyện** (có dấu hay không dấu đều được). Tự cập nhật
+  khả năng mưa (dự báo theo giờ và 7 ngày trong màn Thời tiết). Nhập **tên thành phố hoặc quận/huyện** (có dấu hay không dấu đều được). Tự cập nhật
   30 phút một lần; mất mạng thì giữ số liệu cũ và ghi "mất kết nối", tự thử lại sau 2 phút.
 - **Thẻ lịch và thẻ thời tiết rộng bằng nhau**; **3 màu nền**: Tím hồng (mặc định), Đại dương, Hoàng hôn.
 - Nút **Wi-Fi** mở cài đặt Wi-Fi.
+- **Hàng kênh VTV** (mới ở 2.1) giữa thẻ lịch/thời tiết và dock: logo từng kênh; OK để xem trực tiếp ngay trong Tivi
+  Home (luồng phát miễn phí của VTVgo, cần mạng), ▲ ▼ / CH+ CH− đổi kênh, Back để về. Chọn kênh hoặc ẩn hàng trong
+  *Cài đặt giao diện → Kênh VTV*. Logo kênh là nhãn hiệu của Đài Truyền hình Việt Nam, chỉ dùng để nhận biết kênh.
+- **Ảnh nền mẫu** có sẵn trong APK, dùng làm ảnh nền khi mới cài.
+- Nút **Ngõ vào** (mới ở 1.9, cạnh ổ khoá) trên TV có HDMI / AV / truyền hình: chọn ngõ vào trong danh sách lấy từ TV
+  (HDMI 1, HDMI 2, Truyền hình…), mở bằng ứng dụng Live TV của TV. Chỉ hiện khi TV có ngõ vào thật; TV box không có
+  ngõ vào nên không hiện nút này.
 
 ### Màn Lịch âm dương (chọn thẻ lịch trên Home, bấm OK)
 - **Bên trái — thông tin ngày đang chọn:** thứ, ngày dương; ngày âm ("17 tháng Chín", tháng nhuận nếu có); năm Can Chi;
@@ -115,86 +120,27 @@ nút Giải phóng RAM thường báo "RAM đã gọn".
 - Phím **VI / ABC** tắt Telex; ô mật khẩu, email, link tự chuyển sang ABC. Tự viết hoa chữ đầu ở ô tên/câu.
 - Phím **?123** chuyển sang bảng ký tự đặc biệt (`@ # $ % & * - + = / ( ) [ ] { } ! ? : ; ' " _ ~ ^ < > |`),
   bấm **ABC** để quay lại bảng chữ.
-- **Gõ bằng giọng nói** (mới ở 1.8.2): phím **Nói** (hoặc nút micro/tìm kiếm trên remote khi bàn phím đang mở) nghe
+- **Gõ bằng giọng nói** (mới ở 1.8.2): phím **micro** (hoặc nút micro/tìm kiếm trên remote khi bàn phím đang mở) nghe
   qua micro trên remote, hiện chữ dần trên dòng gợi ý rồi chèn vào ô đang nhập; chế độ VI nhận tiếng Việt, ABC nhận
   tiếng Anh. Dùng dịch vụ giọng nói có sẵn của TV (Google) nên cần mạng; lần đầu hỏi quyền micro (`install.ps1` cấp sẵn).
 - Phím đang chọn chỉ đổi nền sang màu kem, giữ nguyên bo góc và viền như các phím khác.
-- Bàn phím chỉ chiếm nửa dưới màn hình, ô đang nhập vẫn nhìn thấy.
+- Bàn phím chỉ chiếm nửa dưới màn hình, ô đang nhập vẫn nhìn thấy; không có dòng chú thích (dòng trạng thái chỉ hiện
+  khi đang gõ bằng giọng nói).
 
 ### Nhẹ và an toàn
-- APK ~120 KB, chỉ dùng Android framework (không AndroidX, không thư viện ngoài); icon và nền vẽ bằng code; ảnh nền
+- APK ~300 KB (có ảnh nền mẫu và logo kênh), chỉ dùng Android framework (không AndroidX, không thư viện ngoài); icon và nền vẽ bằng code; ảnh nền
   được thu nhỏ và làm mờ một lần rồi lưu đệm. Hợp với TV box RAM 1 GB.
 - Quyền: `INTERNET` (chỉ để lấy thời tiết), `SYSTEM_ALERT_WINDOW` + foreground service (khoá trẻ em), đọc ảnh (ảnh nền,
   trình chiếu), `WRITE_SETTINGS` / `WRITE_SECURE_SETTINGS` (màn hình chờ, cấp qua ADB), `RECORD_AUDIO` (chỉ khi bấm
   Nói trên bàn phím), `KILL_BACKGROUND_PROCESSES` (Dọn dẹp). Không quảng cáo, không thu thập dữ liệu. Xem
   [CHANGELOG.md](CHANGELOG.md) cho lịch sử phiên bản.
 - Bố cục thiết kế trên sân khấu 960×540dp và phóng đều theo màn hình (720p, 1080p, 4K đều giống nhau).
----
-## Cách 1: Cài nhanh bằng ứng dụng "TiviHome-Installer.exe" trên Windows
-- Bật chế độ nhà phát triển trên tivi > ghi lại IP của tivi
-- Khởi động ứng dụng, nhập IP của tivi vào > Kiểm tra kết nối
-- Ứng dụng hỏi có cài đặt các gói cần thiết không > OK > Ứng dụng sẽ tự tải bộ công cụ và Repo này
-- Cài lên tivi và đặt home làm mặc định
-- Dọn ứng dụng rác của nhà mạng nếu cần
----
-## Cách 2: Cài nhanh: một file `.bat` trên Windows
-
-Tải [`Cai-Tivi-Home.bat`](https://github.com/tuanpa-1702/restore-your-tivi/releases), bỏ vào **một thư mục bất kỳ** (Desktop, Downloads, `D:\Tivi`, USB… —
-tên có dấu cách hay tiếng Việt đều được), rồi nháy đúp.
-
-| Bước | Việc xảy ra |
-|---|---|
-| 1 | Lần đầu, tool hỏi `Cai bo cong cu ngay bay gio? [Y/n]` → Enter |
-| 2 | Chọn **`A`** → nhập **IP của TV** (xem trên TV: Cài đặt → Mạng & Internet, hoặc Cài đặt → Thiết bị → Giới thiệu) |
-| 3 | Tool tự tải **JDK 17 + Android SDK 34** (~400 MB, chỉ lần đầu), tải mã nguồn, build APK, rồi cài lên TV |
-| 4 | Trên TV bấm **Cho phép** khi hiện hộp thoại *Allow USB debugging?* |
-| 5 | Vào `[3] → 3` để đặt Tivi Home làm Home, `[3] → 4` để tắt launcher cũ, `[4]` để dọn ứng dụng |
-
-Chế độ `[A]` chạy đúng thứ tự **1 → 5**: nhập IP → bộ công cụ → mã nguồn → build → cài lên TV.
-
-### Menu của tool
-
-| Mục | Chức năng |
-|---|---|
-| `[A]` | Cài tất cả trên máy mới: IP → JDK/SDK → mã nguồn → build → cài lên TV |
-| `[1]` | Chỉ cài bộ công cụ Windows (JDK 17 + Android SDK 34) vào `buildtools\` |
-| `[2]` | Tải mã nguồn (git clone hoặc ZIP) và build APK |
-| `[3]` | Bảng cài launcher: cài/cập nhật, xem app đang là Home, đặt Home, tắt launcher cũ, gỡ app, đổi IP |
-| `[4]` | Dọn dẹp: bảng 12 gói hệ thống, chọn gói cần tắt (chỉ `pm disable-user`, không gỡ) |
-| `[5]` | Khôi phục: bật lại CleanYourTV, bật lại nhóm gói đã tắt, bật một gói bất kỳ, gỡ app |
-| `[6]` | Bật Bàn phím Tivi (Telex) làm bàn phím hệ thống |
-| `[7]` | Sao lưu danh sách gói và cài đặt của TV vào `backup\` |
-| `[8]` | Kiểm tra môi trường: JDK, adb, SDK 34, APK, quyền đang chạy, thử kết nối TV |
-| `[9]` | Đổi IP TV (lưu vào `tivibox.cfg`) |
-| `[0]` | Thoát |
-
-### Yêu cầu
-
-- Windows 10 (1803 trở lên) hoặc Windows 11 — có sẵn `curl`, `tar`, PowerShell 5.1.
-- Khoảng **600 MB** dung lượng trống và mạng internet (lần đầu).
-- TV box **Android 8.0 trở lên**, cùng mạng LAN với máy tính, đã bật **Gỡ lỗi ADB qua mạng**.
-- **Không cần quyền Admin.** Tool chỉ ghi trong thư mục chứa file bat. Nếu cần quyền (thư mục bị chặn, hoặc adb không
-  tạo được `%USERPROFILE%\.android`), tool tự hỏi và tự hiện hộp thoại UAC đúng lúc đó.
-
-### Những gì được tạo ra
-
-```
-Cai-Tivi-Home.bat      file duy nhất bạn cần copy
-buildtools\            JDK 17 + Android SDK 34 (tự tải)
-restore-your-tivi\     mã nguồn (git clone hoặc ZIP)
-android-home\          nơi adb lưu khoá, dùng khi profile Windows bị chặn
-tivibox.cfg            IP TV đã nhớ
-tivibox-log.txt        nhật ký từng bước, dùng khi cần báo lỗi
-backup\                danh sách gói + settings trước khi sửa
-```
-
-Bản chạy CRLF được tạo trong `%LOCALAPPDATA%\TiviHome\` — không làm rác thư mục bạn chọn.
 
 ---
 
-## Cách 3: Cài lên TV (thủ công bằng ADB shell):
+## Cài lên TV
 
-**Yêu cầu:** Android TV / TV box **Android 8.0 trở lên**, máy tính Windows cùng mạng, JDK 17 và Android SDK
+**Yêu cầu:** Android TV / TV box **Android 5.0 trở lên** (Android 5–7 cũng chạy; xem "Android 5–7" bên dưới), máy tính Windows cùng mạng, JDK 17 và Android SDK
 (platform `android-34`, build-tools `34.0.0`, platform-tools). Không cần Android Studio hay Gradle.
 
 ```
@@ -208,7 +154,7 @@ tivihome/          <- repo này
    mạng** nếu có) trong Tuỳ chọn nhà phát triển.
 2. **Build** (chạy test âm lịch trước khi build):
    ```powershell
-   powershell -ExecutionPolicy Bypass -File build.ps1 -VersionCode 21 -VersionName 1.8.3
+   powershell -ExecutionPolicy Bypass -File build.ps1 -VersionCode 28 -VersionName 2.1.4
    ```
    Bộ công cụ ở chỗ khác thì thêm `-BuildTools D:\duong\dan\buildtools`. Lần đầu tạo khoá ký `debug.keystore` —
    **giữ file này** (đã nằm trong `.gitignore`): mất khoá thì bản sau không cài đè được.
@@ -236,7 +182,7 @@ Home; với launcher khác dùng `pm enable <gói>` + `set-home-activity`. Gỡ 
 
 ---
 
-## Cách 4: Cài bằng cách promt cho AI (Claude Code, ChatGPT Codex, Gemini CLI…)
+## Dùng với AI (Claude, ChatGPT, Gemini…)
 
 Dán link repo này vào AI kèm yêu cầu. AI có thể đọc [`AGENTS.md`](AGENTS.md) để biết đọc gì và theo quy tắc nào;
 design system nằm trong [`design/`](design/). Copy nguyên câu lệnh dưới đây (đã có sẵn link repo), chỉ thay phần trong `<...>`:
@@ -286,6 +232,16 @@ Thêm prompt và mẹo: [`design/PROMPT.md`](design/PROMPT.md). AI không mở �
 | `design/reference/` | Bản mẫu HTML từng màn hình (mở `home.html` bằng trình duyệt) |
 | `design/screenshots/` | Ảnh render từ bản mẫu; `design/tools/render.ps1` render lại |
 | `AGENTS.md`, `CLAUDE.md`, `llms.txt` | Hướng dẫn cho AI |
+
+## Android 5–7
+
+Từ 2.0, Tivi Home cài được trên Android 5.0 (API 21) trở lên. Khác biệt trên Android 5–7:
+- Không có hộp thoại xin quyền: mọi quyền (đọc ảnh, micro, hiển thị trên ứng dụng khác) được cấp ngay khi cài.
+- Màn khoá trẻ em phủ lên app khác bằng kiểu cửa sổ cũ của Android 5–7.
+- Ngõ vào: không đọc được tên tuỳ chỉnh của ngõ vào (dùng tên mặc định như "HDMI 1").
+- Ảnh nền / trình chiếu: tìm ảnh bằng cách quét thư mục `/storage` (USB, thẻ nhớ) thay cho danh sách ổ đĩa của Android 11+.
+- Gõ bằng giọng nói cần TV có dịch vụ nhận giọng nói (Google); nhiều box Android 5–6 đời cũ không có.
+- Chưa thử trên thiết bị Android 5–7 thật; mã nguồn đã được rà để mọi hàm mới hơn Android 5 đều có kiểm tra phiên bản.
 
 ## Giới hạn đã biết
 
