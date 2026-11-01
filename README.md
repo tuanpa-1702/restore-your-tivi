@@ -140,6 +140,88 @@ nút Giải phóng RAM thường báo "RAM đã gọn".
 
 ## Cài lên TV
 
+Có hai cách nhanh: **nhờ AI** (dán một prompt) hoặc **dùng bộ cài `TiviHome-Installer.exe`** trên Windows (bấm một
+nút). Cách làm thủ công từng lệnh ở cuối mục này.
+
+**Chuẩn bị chung:** TV / TV box **Android 5.0 trở lên**, máy tính Windows cùng mạng Wi-Fi/LAN với TV. Trên TV:
+**Cài đặt → Thiết bị → Giới thiệu**, bấm **Bản dựng** 7 lần, rồi bật **Gỡ lỗi USB** (và **Gỡ lỗi ADB qua mạng** nếu có)
+trong Tuỳ chọn nhà phát triển; ghi lại IP ở **Cài đặt → Mạng**. Lần đầu máy tính kết nối, TV hỏi **"Cho phép gỡ lỗi
+USB?"**: bấm **Cho phép** bằng remote.
+
+### Cách 1: Nhờ AI
+
+Cần AI **chạy được lệnh trên máy tính**: Claude Code (CLI hoặc tab Code trong app Claude Desktop), Codex CLI, Gemini
+CLI hoặc Cursor. Bản chat trên web (claude.ai, chatgpt.com, gemini.google.com) không chạy được lệnh nên không tự cài
+được. Mở AI trong một thư mục trống, bật chế độ hỏi trước khi chạy lệnh, rồi dán **một lần** khối dưới đây (chỉ sửa 4
+dòng đầu):
+
+```text
+IP của TV: 192.168.1.50
+Lời chào: Xin chào cả nhà!
+Vị trí thời tiết: Hà Nội
+Dọn ứng dụng rác: có
+Repo: https://github.com/tuanpa-1702/restore-your-tivi
+
+Bạn là trợ lý cài đặt Tivi Home cho TV box Android của tôi. Máy tính của tôi là Windows (PowerShell).
+Tải repo trên về thư mục hiện tại (git clone, hoặc tải file ZIP nếu chưa có Git), rồi ĐỌC KỸ AGENTS.md và README.md
+trước khi chạy bất kỳ lệnh nào lên TV. Quy tắc an toàn trong AGENTS.md là bắt buộc. Xong mỗi bước báo ngắn cho tôi.
+
+1. KẾT NỐI: tải Android platform-tools nếu chưa có, adb connect tới TV (báo tôi lúc cần bấm "Cho phép" trên TV).
+   Đọc model, phiên bản Android, RAM và bộ nhớ trống. SDK dưới 21 (Android 5.0) thì dừng và nói rõ.
+2. SAO LƯU vào backup/: danh sách ứng dụng, ứng dụng đang tắt, settings global/secure/system, bàn phím, launcher và
+   màn hình chờ hiện tại.
+3. CÀI ĐẶT: tải APK mới nhất ở mục Releases của repo và kiểm tra SHA-256 (hoặc build bằng build.ps1 nếu không tải
+   được). Cài bằng install.ps1 -Tv <IP>; nếu cài APK tải sẵn thì tự cấp quyền như install.ps1 làm, theo đúng phiên
+   bản Android của TV. Chụp màn hình TV cho tôi xem.
+4. MÀN HÌNH CHÍNH: HỎI TÔI trước khi đặt Tivi Home làm Home. Đặt xong bấm Home, kiểm tra mFocusedApp là
+   com.tivibox.home; chỉ khi đúng mới HỎI TÔI có tắt launcher cũ không (pm disable-user --user 0).
+5. BÀN PHÍM VÀ MÀN HÌNH CHỜ: bật com.tivibox.home/.KeyboardService làm bàn phím mặc định; đặt Tivi Home làm màn hình
+   chờ (com.tivibox.home/.TiviDream), chờ 10 phút.
+6. DỌN ỨNG DỤNG (nếu dòng "Dọn ứng dụng rác" là có): liệt kê app đang bật thành 4 nhóm (rác hệ thống an toàn để tắt,
+   phần mềm hãng không rõ, tính năng có thể đang dùng, app tôi tự cài). Gói không rõ chỉ xem bằng dumpsys, KHÔNG mở.
+   Trình bày thành bảng, CHỜ TÔI CHỌN, rồi tắt theo nhóm nhỏ và chụp màn hình kiểm tra.
+7. KIỂM TRA: khởi động lại TV; xác nhận TV vào Tivi Home, Wi-Fi và ADB vẫn kết nối.
+8. KẾT THÚC: hướng dẫn tôi nhập lời chào và vị trí thời tiết bằng remote trong "Cài đặt giao diện" (các mục này
+   không đặt được qua ADB); viết KHOI-PHUC.md với lệnh hoàn tác; hướng dẫn tôi tắt Gỡ lỗi USB / ADB qua mạng.
+
+Quy tắc bắt buộc: chỉ tắt bằng pm disable-user --user 0, KHÔNG BAO GIỜ pm uninstall ứng dụng hệ thống; mỗi lệnh pm
+chạy riêng; không mở ứng dụng factory/test; không đụng HDMI/tuner, remote/Bluetooth, bàn phím hệ thống, Play Store,
+Play Services; không hỏi mật khẩu Wi-Fi hay tài khoản Google. Không chắc thì hỏi tôi.
+```
+
+AI dừng lại hỏi bạn ở 4 chỗ: bấm "Cho phép" trên TV, đặt màn hình chính, tắt launcher cũ, chọn ứng dụng để tắt.
+
+### Cách 2: Bộ cài TiviHome-Installer.exe (Windows)
+
+Một file exe duy nhất: tự tải JDK 17 và Android SDK 34 (khoảng 400 MB, chỉ lần đầu), tự lấy mã nguồn mới nhất từ repo
+này, tự build và cài lên TV, cấp quyền theo đúng phiên bản Android của TV (5–14), bật Bàn phím Tivi; có sẵn nút điều
+khiển TV bằng chuột (scrcpy) và dọn ứng dụng rác.
+
+1. Tải `TiviHome-Installer.exe` ở mục **Releases**, chép vào một thư mục riêng (ví dụ `C:\TiviHome`) rồi mở. Windows
+   báo "Windows protected your PC" thì bấm **More info → Run anyway** (file chưa có chữ ký số).
+2. Nhập IP của TV vào ô **IP TV**.
+
+   ![Nhập IP của TV](design/installer/exe-02-nhap-ip.png)
+
+3. Bấm **Cài đặt / Cập nhật**. Lần đầu bộ cài hỏi tải bộ công cụ: bấm **Yes**.
+
+   ![Hỏi tải bộ công cụ](design/installer/exe-03-hoi-cai-bo-cong-cu.png)
+
+4. Bộ cài chạy 5 bước: IP TV → Bộ công cụ → Mã nguồn → Build APK → Cài lên TV. Bước Build tự đọc số phiên bản mới
+   nhất trong README này và ký bằng khoá lưu ở thư mục `keys\` cạnh exe.
+
+   ![Đang build APK](design/installer/exe-05-build-apk.png)
+
+5. Cả 5 bước có dấu ✔ và dòng trạng thái báo **"Xong - đã cài Tivi Home lên TV"** là thành công. Bấm **Đặt làm Home**
+   để đặt Tivi Home làm màn hình chính (Android 5–6: chọn Tivi Home → "Luôn luôn" trên TV).
+
+   ![Cài xong](design/installer/exe-06-cai-xong.png)
+
+**Giữ thư mục `keys\` cạnh exe**: lần sau bấm Cài đặt / Cập nhật là cập nhật đè, giữ nguyên cài đặt trong app. Mã
+nguồn bộ cài không nằm trong repo này.
+
+### Cài thủ công (cho người muốn tự build)
+
 **Yêu cầu:** Android TV / TV box **Android 5.0 trở lên** (Android 5–7 cũng chạy; xem "Android 5–7" bên dưới), máy tính Windows cùng mạng, JDK 17 và Android SDK
 (platform `android-34`, build-tools `34.0.0`, platform-tools). Không cần Android Studio hay Gradle.
 
@@ -182,7 +264,7 @@ Home; với launcher khác dùng `pm enable <gói>` + `set-home-activity`. Gỡ 
 
 ---
 
-## Dùng với AI (Claude, ChatGPT, Gemini…)
+## Thiết kế thêm với AI (Claude, ChatGPT, Gemini…)
 
 Dán link repo này vào AI kèm yêu cầu. AI có thể đọc [`AGENTS.md`](AGENTS.md) để biết đọc gì và theo quy tắc nào;
 design system nằm trong [`design/`](design/). Copy nguyên câu lệnh dưới đây (đã có sẵn link repo), chỉ thay phần trong `<...>`:
@@ -207,12 +289,7 @@ Dùng design system ở https://github.com/tuanpa-1702/restore-your-tivi để d
 Giữ nguyên token màu, cỡ chữ, bo góc, kiểu focus và sân khấu 960x540 phóng đều theo màn hình.
 ```
 
-**Nhờ AI cài lên TV** (AI có quyền chạy lệnh như Claude Code, Codex, Cursor)
-```
-Clone https://github.com/tuanpa-1702/restore-your-tivi, đọc AGENTS.md và README.md. TV box của tôi ở IP <192.168.1.50>, đã bật USB debugging.
-Build bằng build.ps1, cài bằng install.ps1, chụp màn hình kiểm tra. Hỏi tôi trước khi đặt làm Home mặc định
-hoặc tắt launcher cũ; chỉ tắt (pm disable-user), không gỡ ứng dụng hệ thống.
-```
+**Nhờ AI cài lên TV**: dùng prompt đầy đủ ở mục [Cài lên TV → Cách 1](#cách-1-nhờ-ai).
 
 Thêm prompt và mẹo: [`design/PROMPT.md`](design/PROMPT.md). AI không mở được link repo thì dán link file thô
 `https://raw.githubusercontent.com/tuanpa-1702/restore-your-tivi/main/design/DESIGN.md`.
@@ -230,7 +307,8 @@ Thêm prompt và mẹo: [`design/PROMPT.md`](design/PROMPT.md). AI không mở �
 | `design/DESIGN.md` | Đặc tả thiết kế: nguyên tắc, lưới, màu, chữ, focus, component, điều hướng remote |
 | `design/tokens/` | Giá trị chính xác (`tokens.json`, `tokens.css`) |
 | `design/reference/` | Bản mẫu HTML từng màn hình (mở `home.html` bằng trình duyệt) |
-| `design/screenshots/` | Ảnh render từ bản mẫu; `design/tools/render.ps1` render lại |
+| `design/screenshots/` | Ảnh chụp giao diện trên TV (ảnh nền demo) và ảnh render từ bản mẫu; `design/tools/render.ps1` render lại |
+| `design/installer/` | Ảnh các bước của bộ cài `TiviHome-Installer.exe` |
 | `AGENTS.md`, `CLAUDE.md`, `llms.txt` | Hướng dẫn cho AI |
 
 ## Android 5–7
